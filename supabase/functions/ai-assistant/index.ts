@@ -260,16 +260,26 @@ serve(async (req) => {
     const data = await response.json();
     let reply = data.choices?.[0]?.message?.content || "Извините, не удалось получить ответ.";
     
-    // Check if there's lead data to extract
+    // Check if there's lead data to extract - use more robust regex
     let leadData = null;
-    const leadMatch = reply.match(/\[LEAD_DATA\](.*?)\[\/LEAD_DATA\]/s);
+    const leadMatch = reply.match(/\[?LEAD_DATA\]?\s*(\{.*?\})\s*\[?\/?LEAD_DATA\]?/s);
     if (leadMatch) {
       try {
         leadData = JSON.parse(leadMatch[1]);
-        reply = reply.replace(/\[LEAD_DATA\].*?\[\/LEAD_DATA\]/s, "").trim();
+        // Remove ALL LEAD_DATA related text from reply
+        reply = reply
+          .replace(/\[?LEAD_DATA\]?\s*\{.*?\}\s*\[?\/?LEAD_DATA\]?/gs, "")
+          .replace(/LEAD_DATA/g, "")
+          .replace(/\[\/LEAD_DATA\]/g, "")
+          .trim();
         console.log("Extracted lead data:", leadData);
       } catch (e) {
         console.error("Failed to parse lead data:", e);
+        // Still try to clean up the text even if parsing fails
+        reply = reply
+          .replace(/\[?LEAD_DATA\]?.*?\[?\/?LEAD_DATA\]?/gs, "")
+          .replace(/LEAD_DATA/g, "")
+          .trim();
       }
     }
 
