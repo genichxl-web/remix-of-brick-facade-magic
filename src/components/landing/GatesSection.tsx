@@ -1,4 +1,6 @@
 import { Check } from "lucide-react";
+import ImageGallery from "./ImageGallery";
+import CTAButton from "./CTAButton";
 
 const GatesSection = () => {
   const features = [
@@ -17,7 +19,7 @@ const GatesSection = () => {
             🚪 Ворота и калитка в едином стиле
           </h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
             {features.map((feature, index) => (
               <div key={index} className="flex items-start gap-3 bg-background rounded-lg p-4 shadow-sm">
                 <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -25,6 +27,12 @@ const GatesSection = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        <ImageGallery />
+        
+        <div className="text-center">
+          <CTAButton />
         </div>
       </div>
     </section>

@@ -1,5 +1,7 @@
 import nightImage from "@/assets/night-lighting.jpg";
 import { Check } from "lucide-react";
+import ImageGallery from "./ImageGallery";
+import CTAButton from "./CTAButton";
 
 const LightingSection = () => {
   const features = [
@@ -12,7 +14,7 @@ const LightingSection = () => {
   return (
     <section className="py-20 bg-foreground text-background">
       <div className="container">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-8">
           <div className="order-2 lg:order-1">
             <img
               src={nightImage}
@@ -35,6 +37,12 @@ const LightingSection = () => {
               ))}
             </ul>
           </div>
+        </div>
+
+        <ImageGallery />
+        
+        <div className="text-center">
+          <CTAButton />
         </div>
       </div>
     </section>
