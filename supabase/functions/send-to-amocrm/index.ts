@@ -33,8 +33,8 @@ serve(async (req) => {
 
     console.log(`Sending lead to AMO CRM subdomain: ${subdomain}, name: ${name}, phone: ${phone}`);
 
-    // Create a lead in AMO CRM
-    const response = await fetch(`https://${subdomain}.amocrm.ru/api/v4/leads/complex`, {
+    // Create lead in "Неразобранное" (unsorted)
+    const response = await fetch(`https://${subdomain}.amocrm.ru/api/v4/leads/unsorted/forms`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -42,8 +42,15 @@ serve(async (req) => {
       },
       body: JSON.stringify([
         {
-          name: `Заявка с сайта: ${name}`,
+          source_uid: `website_${Date.now()}`,
+          source_name: "Сайт БРИК",
+          created_at: Math.floor(Date.now() / 1000),
           _embedded: {
+            leads: [
+              {
+                name: `Заявка с сайта: ${name}`,
+              }
+            ],
             contacts: [
               {
                 name: name,
@@ -60,6 +67,12 @@ serve(async (req) => {
                 ]
               }
             ]
+          },
+          metadata: {
+            form_id: "brik_contact_form",
+            form_name: "Форма заявки БРИК",
+            form_page: "https://brik-fence.ru",
+            form_sent_at: Math.floor(Date.now() / 1000),
           }
         }
       ]),
