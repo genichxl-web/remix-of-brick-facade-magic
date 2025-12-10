@@ -24,7 +24,7 @@ const Admin = () => {
   const navigate = useNavigate();
 
   // Simple password protection (for demo purposes)
-  const ADMIN_PASSWORD = "brik2024";
+  const ADMIN_PASSWORD = "0000";
 
   useEffect(() => {
     if (isAuthenticated) {
