@@ -1,12 +1,47 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Header from "@/components/landing/Header";
+import HeroSection from "@/components/landing/HeroSection";
+import TargetAudienceSection from "@/components/landing/TargetAudienceSection";
+import ServicesSection from "@/components/landing/ServicesSection";
+import TextureSection from "@/components/landing/TextureSection";
+import PillarsSection from "@/components/landing/PillarsSection";
+import FoundationSection from "@/components/landing/FoundationSection";
+import LightingSection from "@/components/landing/LightingSection";
+import SymmetrySection from "@/components/landing/SymmetrySection";
+import GatesSection from "@/components/landing/GatesSection";
+import PortfolioSection from "@/components/landing/PortfolioSection";
+import ReviewsSection from "@/components/landing/ReviewsSection";
+import PriceComparisonSection from "@/components/landing/PriceComparisonSection";
+import PricingSection from "@/components/landing/PricingSection";
+import AboutSection from "@/components/landing/AboutSection";
+import ProcessSection from "@/components/landing/ProcessSection";
+import GeographySection from "@/components/landing/GeographySection";
+import ContactSection from "@/components/landing/ContactSection";
+import Footer from "@/components/landing/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        <HeroSection />
+        <TargetAudienceSection />
+        <ServicesSection />
+        <TextureSection />
+        <PillarsSection />
+        <FoundationSection />
+        <LightingSection />
+        <SymmetrySection />
+        <GatesSection />
+        <PortfolioSection />
+        <ReviewsSection />
+        <PriceComparisonSection />
+        <PricingSection />
+        <AboutSection />
+        <ProcessSection />
+        <GeographySection />
+        <ContactSection />
+      </main>
+      <Footer />
     </div>
   );
 };
