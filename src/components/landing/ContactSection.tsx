@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactSection = () => {
   const [name, setName] = useState("");
@@ -14,17 +15,32 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Заявка отправлена!",
-      description: "Мы перезвоним вам в течение 5-10 минут.",
-    });
-    
-    setName("");
-    setPhone("");
-    setIsSubmitting(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-to-amocrm', {
+        body: { name, phone }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Заявка отправлена!",
+        description: "Мы перезвоним вам в течение 5-10 минут.",
+      });
+      
+      setName("");
+      setPhone("");
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить заявку. Попробуйте позже.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
