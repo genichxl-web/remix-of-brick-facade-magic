@@ -2,6 +2,8 @@ import { useState } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const AIAssistantWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,23 +12,44 @@ const AIAssistantWidget = () => {
     { role: "assistant", content: "Здравствуйте! Я AI-ассистент БРИК. Чем могу помочь? Задайте вопрос о наших заборах, ценах или услугах." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
 
     const userMessage = message.trim();
     setMessage("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
+    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    setMessages(newMessages);
     setIsLoading(true);
 
-    // Simulate AI response for now
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: "Спасибо за ваш вопрос! Для получения детальной консультации оставьте заявку через форму на сайте или позвоните нам. Мы с радостью ответим на все ваши вопросы о системе БРИК." 
-      }]);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-assistant", {
+        body: { messages: newMessages.map(m => ({ role: m.role, content: m.content })) }
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast({
+          title: "Ошибка",
+          description: data.error,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+    } catch (error) {
+      console.error("AI Assistant error:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось получить ответ. Попробуйте позже.",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
