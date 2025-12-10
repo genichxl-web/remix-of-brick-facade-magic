@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,18 @@ const AIAssistantWidget = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [showPulse, setShowPulse] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isOpen) {
+        setShowPulse(true);
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSend = async () => {
     if (!message.trim() || isLoading || leadSubmitted) return;
@@ -164,13 +175,14 @@ const AIAssistantWidget = () => {
 
       {/* Floating Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`group relative w-16 h-16 rounded-full bg-primary shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center ${
-          isOpen ? "" : "animate-pulse"
-        }`}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setShowPulse(false);
+        }}
+        className="group relative w-16 h-16 rounded-full bg-primary shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
       >
-        {/* Ripple Effect */}
-        {!isOpen && (
+        {/* Ripple Effect - only after 30 seconds */}
+        {!isOpen && showPulse && (
           <>
             <span className="absolute w-full h-full rounded-full bg-primary/50 animate-ping" />
             <span className="absolute w-20 h-20 rounded-full border-2 border-primary/30 animate-[ping_2s_ease-in-out_infinite]" />
@@ -181,13 +193,6 @@ const AIAssistantWidget = () => {
           <X className="w-7 h-7 text-primary-foreground transition-transform duration-300" />
         ) : (
           <MessageCircle className="w-7 h-7 text-primary-foreground transition-transform duration-300 group-hover:scale-110" />
-        )}
-
-        {/* Notification Badge */}
-        {!isOpen && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center text-xs text-destructive-foreground font-bold animate-bounce">
-            1
-          </span>
         )}
       </button>
 
