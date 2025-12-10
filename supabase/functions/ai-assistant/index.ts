@@ -59,13 +59,7 @@ async function sendToAmoCRM(leadData: {
           _embedded: {
             leads: [
               {
-                name: `AI-чат: ${leadData.name}`,
-                custom_fields_values: [
-                  {
-                    field_id: 123, // Replace with actual field ID or remove if not needed
-                    values: [{ value: noteText }]
-                  }
-                ]
+                name: `AI-чат: ${leadData.name} | ${leadData.phone}`,
               }
             ],
             contacts: [
@@ -85,7 +79,8 @@ async function sendToAmoCRM(leadData: {
             form_name: "AI-Ассистент БРИК",
             form_page: "https://brik-fence.ru",
             form_sent_at: Math.floor(Date.now() / 1000),
-            ip: "127.0.0.1"
+            ip: "127.0.0.1",
+            form_data: noteText
           }
         }
       ])
