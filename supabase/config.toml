@@ -1,1 +1,4 @@
 project_id = "kroivjljpohdcntkaamu"
+
+[functions.send-to-amocrm]
+verify_jwt = false
