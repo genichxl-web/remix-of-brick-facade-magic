@@ -37,7 +37,7 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="portfolio" />
         
         <div className="text-center">
           <CTAButton />

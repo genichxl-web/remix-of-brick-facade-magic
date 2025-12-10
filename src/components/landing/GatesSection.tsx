@@ -29,7 +29,7 @@ const GatesSection = () => {
           </div>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="gates" />
         
         <div className="text-center">
           <CTAButton />

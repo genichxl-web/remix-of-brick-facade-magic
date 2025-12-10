@@ -1,8 +1,12 @@
+import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
 import heroImage from "@/assets/hero-fence.jpg";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Factory, Wrench, Shield } from "lucide-react";
+import { Factory, Wrench, Shield } from "lucide-react";
 
 const HeroSection = () => {
+  const { photos } = useGalleryPhotos("hero");
+  const backgroundImage = photos.length > 0 ? photos[0].image_url : heroImage;
+
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -11,7 +15,7 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex items-center">
       <div className="absolute inset-0">
         <img
-          src={heroImage}
+          src={backgroundImage}
           alt="Премиальный лицевой забор БРИК с подсветкой"
           className="w-full h-full object-cover"
         />
@@ -20,7 +24,7 @@ const HeroSection = () => {
       
       <div className="container relative z-10 py-20">
         <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-primary-foreground leading-tight mb-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight mb-6">
             Премиальные лицевые заборы на фундаменте с автоматическими воротами{" "}
             <span className="text-primary">под ключ</span> в Московской области
           </h1>
@@ -34,7 +38,7 @@ const HeroSection = () => {
           
           <div className="bg-card/10 backdrop-blur-sm rounded-lg p-4 mb-8 inline-block">
             <p className="text-primary-foreground/80 text-sm">
-              📍 Работаем по всей Московской области
+              Работаем по всей Московской области
             </p>
           </div>
           

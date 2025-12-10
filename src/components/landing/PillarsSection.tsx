@@ -28,7 +28,7 @@ const PillarsSection = () => {
           </div>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="pillars" />
         
         <div className="text-center">
           <CTAButton />

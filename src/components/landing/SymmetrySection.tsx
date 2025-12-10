@@ -19,7 +19,7 @@ const SymmetrySection = () => {
           </p>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="symmetry" />
         
         <div className="text-center">
           <CTAButton />

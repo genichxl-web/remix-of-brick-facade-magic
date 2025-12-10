@@ -39,7 +39,7 @@ const LightingSection = () => {
           </div>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="lighting" />
         
         <div className="text-center">
           <CTAButton />
