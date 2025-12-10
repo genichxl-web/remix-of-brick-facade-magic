@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -89,44 +90,34 @@ async function sendToAmoCRM(leadData: {
   }
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+async function getSystemPrompt(supabase: any, colors: string[], fills: string[]): Promise<string> {
+  const colorOptions = colors.length > 0 
+    ? colors.map((c: string, i: number) => `${i + 1}. ${c}`).join("\n")
+    : "1. Графит\n2. Коричневый\n3. Бежевый\n4. Терракот";
+  
+  const fillOptions = fills.length > 0
+    ? fills.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n")
+    : "1. Профлист\n2. Штакетник\n3. Блоки БРИК";
+
+  // Try to get custom prompt from database
+  const { data } = await supabase
+    .from("ai_settings")
+    .select("value")
+    .eq("key", "system_prompt")
+    .single();
+
+  if (data?.value) {
+    // Replace placeholders in custom prompt
+    let prompt = data.value;
+    prompt = prompt.replace(/\{COLORS\}/g, colorOptions);
+    prompt = prompt.replace(/\{FILLS\}/g, fillOptions);
+    prompt = prompt.replace(/\{COLOR_COUNT\}/g, String(colors.length || 4));
+    prompt = prompt.replace(/\{FILL_COUNT\}/g, String(fills.length || 3));
+    return prompt;
   }
 
-  try {
-    const { messages, submitLead, colors, fills } = await req.json();
-    
-    if (submitLead) {
-      console.log("Submitting lead to AMO CRM:", submitLead);
-      const success = await sendToAmoCRM(submitLead);
-      return new Response(
-        JSON.stringify({ 
-          leadSubmitted: success,
-          reply: success 
-            ? "Отлично! Я передал вашу заявку нашим специалистам. Они свяжутся с вами в ближайшее время для уточнения деталей и расчёта стоимости. Спасибо за интерес к заборам БРИК!" 
-            : "Произошла ошибка при отправке заявки. Пожалуйста, попробуйте оставить заявку через форму на сайте или позвоните нам."
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
-
-    // Build dynamic color and fill options
-    const colorOptions = colors && colors.length > 0 
-      ? colors.map((c: string, i: number) => `${i + 1}. ${c}`).join("\n")
-      : "1. Графит\n2. Коричневый\n3. Бежевый\n4. Терракот";
-    
-    const fillOptions = fills && fills.length > 0
-      ? fills.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n")
-      : "1. Профлист\n2. Штакетник\n3. Блоки БРИК";
-
-    const systemPrompt = `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
+  // Fallback to default prompt
+  return `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
 
 ТВОЯ ГЛАВНАЯ ЗАДАЧА: Собрать информацию для расчёта стоимости забора.
 
@@ -152,51 +143,11 @@ serve(async (req) => {
 - Когда получишь имя и телефон, поблагодари и скажи что передашь заявку менеджеру
 - Если клиент выбирает "Позвоните мне", сразу переходи к запросу имени и телефона
 
-ФОРМАТ ВАРИАНТОВ:
-Выберите высоту столбов:
-1. 2 метра
-2. 2.2 метра
-3. 2.5 метра
-4. Свой вариант
-5. Позвоните мне
-
-СТАНДАРТНЫЕ ВАРИАНТЫ:
-
-Высота столбов:
-1. 2 метра
-2. 2.2 метра
-3. 2.5 метра
-4. Свой вариант
-5. Позвоните мне
-
-Высота цоколя:
-1. 20 см
-2. 30 см
-3. 40 см
-4. Свой вариант
-5. Позвоните мне
-
 Тип заполнения (клиент увидит фотографии каждого варианта):
 ${fillOptions}
-${fills && fills.length > 0 ? fills.length + 1 : 4}. Свой вариант
-${fills && fills.length > 0 ? fills.length + 2 : 5}. Позвоните мне
 
 Цвет столбов (клиент увидит фотографии каждого цвета):
 ${colorOptions}
-${colors && colors.length > 0 ? colors.length + 1 : 5}. Свой вариант
-${colors && colors.length > 0 ? colors.length + 2 : 6}. Позвоните мне
-
-Ворота и калитка:
-1. Да, нужны ворота и калитка
-2. Только ворота
-3. Только калитка
-4. Нет, не нужны
-5. Позвоните мне
-
-Подсветка:
-1. Да, нужна архитектурная подсветка
-2. Нет, не нужна
-3. Позвоните мне
 
 ИНФОРМАЦИЯ О ПРОДУКТЕ:
 - Система ЛИЦЕВОЙ ЗАБОР БРИК — премиальное ограждение с натуральной колотой текстурой
@@ -211,6 +162,43 @@ ${colors && colors.length > 0 ? colors.length + 2 : 6}. Позвоните мн�
 [LEAD_DATA]{"name":"имя","phone":"телефон","width":"ширина","pillarHeight":"высота столбов","baseHeight":"высота цоколя","fillType":"тип заполнения","color":"цвет","gates":"ворота/калитка","lighting":"подсветка"}[/LEAD_DATA]
 
 Заполни все поля из собранной информации. Если какой-то параметр не был указан, напиши "не указано".`;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { messages, submitLead, colors, fills } = await req.json();
+    
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    if (submitLead) {
+      console.log("Submitting lead to AMO CRM:", submitLead);
+      const success = await sendToAmoCRM(submitLead);
+      return new Response(
+        JSON.stringify({ 
+          leadSubmitted: success,
+          reply: success 
+            ? "Отлично! Я передал вашу заявку нашим специалистам. Они свяжутся с вами в ближайшее время для уточнения деталей и расчёта стоимости. Спасибо за интерес к заборам БРИК!" 
+            : "Произошла ошибка при отправке заявки. Пожалуйста, попробуйте оставить заявку через форму на сайте или позвоните нам."
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    
+    if (!LOVABLE_API_KEY) {
+      throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Get system prompt from database
+    const systemPrompt = await getSystemPrompt(supabase, colors || [], fills || []);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
