@@ -1,9 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
 import heroImage from "@/assets/hero-fence.jpg";
 import nightImage from "@/assets/night-lighting.jpg";
 
 const PortfolioSection = () => {
-  const projects = [
+  const { photos } = useGalleryPhotos("portfolio");
+  
+  const defaultProjects = [
     {
       title: "Забор 32 м, автоматические ворота",
       location: "КП «Новорижский»",
@@ -30,11 +33,19 @@ const PortfolioSection = () => {
     },
   ];
 
+  // If we have photos from database, use them with default titles
+  const projects = photos.length > 0 
+    ? photos.slice(0, 8).map((photo, index) => ({
+        ...defaultProjects[index % defaultProjects.length],
+        image: photo.image_url
+      }))
+    : defaultProjects;
+
   return (
     <section id="portfolio" className="py-20 bg-background">
       <div className="container">
-        <h2 className="text-3xl md:text-4xl font-serif font-bold text-center mb-4">
-          🏗 Портфолио
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          Портфолио
         </h2>
         <p className="text-lg text-muted-foreground text-center mb-12">
           Реальные объекты наших клиентов

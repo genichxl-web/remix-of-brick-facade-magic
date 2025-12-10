@@ -28,7 +28,7 @@ const FoundationSection = () => {
           </div>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="foundation" />
         
         <div className="text-center">
           <CTAButton />

@@ -45,7 +45,7 @@ const TextureSection = () => {
           </div>
         </div>
 
-        <ImageGallery />
+        <ImageGallery sectionKey="texture" />
         
         <div className="text-center">
           <CTAButton />
