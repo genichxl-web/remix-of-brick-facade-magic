@@ -18,14 +18,20 @@ serve(async (req) => {
       throw new Error('Name and phone are required');
     }
 
-    const subdomain = Deno.env.get('AMO_CRM_SUBDOMAIN');
+    let subdomain = Deno.env.get('AMO_CRM_SUBDOMAIN') || '';
     const accessToken = Deno.env.get('AMO_CRM_ACCESS_TOKEN');
 
     if (!subdomain || !accessToken) {
       throw new Error('AMO CRM credentials not configured');
     }
 
-    console.log(`Sending lead to AMO CRM: ${name}, ${phone}`);
+    // Extract just the subdomain if user entered full URL
+    subdomain = subdomain
+      .replace(/^https?:\/\//, '')  // Remove protocol
+      .replace(/\.amocrm\.ru\/?.*$/, '')  // Remove domain suffix
+      .trim();
+
+    console.log(`Sending lead to AMO CRM subdomain: ${subdomain}, name: ${name}, phone: ${phone}`);
 
     // Create a lead in AMO CRM
     const response = await fetch(`https://${subdomain}.amocrm.ru/api/v4/leads/complex`, {
