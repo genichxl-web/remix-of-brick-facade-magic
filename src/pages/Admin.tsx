@@ -230,6 +230,44 @@ const Admin = () => {
     setUploading(null);
   };
 
+  const handleBulkColorUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    setUploading("color-bulk");
+    let uploadedCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!validateFile(file)) continue;
+
+      // Extract name from filename (remove extension)
+      const colorName = file.name.replace(/\.[^/.]+$/, "").trim();
+      if (!colorName) continue;
+
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const fileName = `colors/${Date.now()}-${i}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, file);
+      if (uploadError) continue;
+
+      const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(fileName);
+
+      const { error: dbError } = await supabase.from("pillar_colors").insert({
+        name: colorName,
+        image_url: urlData.publicUrl,
+        display_order: pillarColors.length + uploadedCount
+      });
+
+      if (!dbError) uploadedCount++;
+    }
+
+    if (uploadedCount > 0) {
+      toast({ title: "Цвета добавлены", description: `Загружено ${uploadedCount} цветов` });
+      fetchPillarColors();
+    }
+    setUploading(null);
+  };
+
   const handleFillUpload = async (file: File) => {
     if (!newFillName.trim()) {
       toast({ title: "Введите название заполнения", variant: "destructive" });
@@ -424,8 +462,8 @@ const Admin = () => {
                 <CardDescription>Добавьте 18 вариантов цветов с фотографиями. Эти фото будут показаны в AI-чате.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex gap-3 items-end">
-                  <div className="flex-1">
+                <div className="flex flex-wrap gap-3 items-end">
+                  <div className="flex-1 min-w-[200px]">
                     <label className="text-sm font-medium mb-2 block">Название цвета</label>
                     <Input
                       placeholder="Например: Графит"
@@ -445,7 +483,21 @@ const Admin = () => {
                       <span><Upload className="h-4 w-4 mr-2" />{uploading === "color" ? "Загрузка..." : "Добавить цвет"}</span>
                     </Button>
                   </label>
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleBulkColorUpload(e.target.files)}
+                      disabled={uploading === "color-bulk"}
+                    />
+                    <Button variant="outline" disabled={uploading === "color-bulk"} asChild>
+                      <span><Upload className="h-4 w-4 mr-2" />{uploading === "color-bulk" ? "Загрузка..." : "Групповая загрузка"}</span>
+                    </Button>
+                  </label>
                 </div>
+                <p className="text-sm text-muted-foreground">💡 Для групповой загрузки название цвета берётся из имени файла</p>
 
                 {pillarColors.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
