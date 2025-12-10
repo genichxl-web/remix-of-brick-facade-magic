@@ -5,15 +5,35 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+interface PillarColor {
+  id: string;
+  name: string;
+  image_url: string;
+}
+
+interface FillType {
+  id: string;
+  name: string;
+  image_url: string;
+}
+
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  images?: { url: string; name: string }[];
+}
+
 const AIAssistantWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: "Здравствуйте! Я AI-ассистент БРИК. Давайте рассчитаем стоимость забора для вашего участка. Подскажите, какова ширина участка в метрах?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
+  const [pillarColors, setPillarColors] = useState<PillarColor[]>([]);
+  const [fillTypes, setFillTypes] = useState<FillType[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -35,18 +55,35 @@ const AIAssistantWidget = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    fetchColorsAndFills();
+  }, []);
+
+  const fetchColorsAndFills = async () => {
+    const [colorsRes, fillsRes] = await Promise.all([
+      supabase.from("pillar_colors").select("*").order("display_order"),
+      supabase.from("fill_types").select("*").order("display_order")
+    ]);
+    if (colorsRes.data) setPillarColors(colorsRes.data);
+    if (fillsRes.data) setFillTypes(fillsRes.data);
+  };
+
   const handleSend = async () => {
     if (!message.trim() || isLoading || leadSubmitted) return;
 
     const userMessage = message.trim();
     setMessage("");
-    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    const newMessages: ChatMessage[] = [...messages, { role: "user", content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke("ai-assistant", {
-        body: { messages: newMessages.map(m => ({ role: m.role, content: m.content })) }
+        body: { 
+          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          colors: pillarColors.map(c => c.name),
+          fills: fillTypes.map(f => f.name)
+        }
       });
 
       if (error) throw error;
@@ -81,7 +118,16 @@ const AIAssistantWidget = () => {
 
         setMessages(prev => [...prev, { role: "assistant", content: submitData?.reply || data.reply }]);
       } else {
-        setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+        // Check if we should show color or fill images
+        let images: { url: string; name: string }[] | undefined;
+        
+        if (data.showColors && pillarColors.length > 0) {
+          images = pillarColors.map(c => ({ url: c.image_url, name: c.name }));
+        } else if (data.showFills && fillTypes.length > 0) {
+          images = fillTypes.map(f => ({ url: f.image_url, name: f.name }));
+        }
+
+        setMessages(prev => [...prev, { role: "assistant", content: data.reply, images }]);
       }
     } catch (error) {
       console.error("AI Assistant error:", error);
@@ -93,6 +139,10 @@ const AIAssistantWidget = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleImageSelect = (name: string) => {
+    setMessage(name);
   };
 
   return (
@@ -122,21 +172,44 @@ const AIAssistantWidget = () => {
           </div>
 
           {/* Messages */}
-          <div className="h-72 overflow-y-auto p-4 space-y-3 bg-background">
+          <div className="h-80 overflow-y-auto p-4 space-y-3 bg-background">
             {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                    msg.role === "user"
-                      ? "bg-primary text-primary-foreground rounded-br-md"
-                      : "bg-muted text-foreground rounded-bl-md"
-                  }`}
-                >
-                  {msg.content}
+              <div key={index}>
+                <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] p-3 rounded-2xl text-sm ${
+                      msg.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted text-foreground rounded-bl-md"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
                 </div>
+                {/* Image Grid */}
+                {msg.images && msg.images.length > 0 && (
+                  <div className="mt-2 grid grid-cols-3 gap-1.5">
+                    {msg.images.map((img, imgIndex) => (
+                      <button
+                        key={imgIndex}
+                        onClick={() => handleImageSelect(img.name)}
+                        className="group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors"
+                      >
+                        <img
+                          src={img.url}
+                          alt={img.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="text-white text-xs font-medium text-center px-1">{img.name}</span>
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 py-0.5 px-1">
+                          <span className="text-white text-[10px] truncate block text-center">{img.name}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && (

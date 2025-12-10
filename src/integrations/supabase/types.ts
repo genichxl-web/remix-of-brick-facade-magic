@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      fill_types: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
       gallery_photos: {
         Row: {
           created_at: string
@@ -35,6 +59,30 @@ export type Database = {
           id?: string
           image_url?: string
           section_key?: string
+        }
+        Relationships: []
+      }
+      pillar_colors: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          image_url: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          name?: string
         }
         Relationships: []
       }
