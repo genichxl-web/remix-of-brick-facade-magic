@@ -19,14 +19,11 @@ async function sendToAmoCRM(leadData: {
   let subdomain = Deno.env.get("AMO_CRM_SUBDOMAIN") || "";
   const accessToken = Deno.env.get("AMO_CRM_ACCESS_TOKEN");
 
-  // Clean subdomain - remove https://, http://, .amocrm.ru, trailing slashes
   subdomain = subdomain
     .replace(/^https?:\/\//i, "")
     .replace(/\.amocrm\.ru.*$/i, "")
     .replace(/\//g, "")
     .trim();
-
-  console.log("Cleaned AMO CRM subdomain:", subdomain);
 
   if (!subdomain || !accessToken) {
     console.error("AMO CRM credentials not configured");
@@ -57,22 +54,14 @@ async function sendToAmoCRM(leadData: {
           source_name: "AI-Ассистент БРИК",
           created_at: Math.floor(Date.now() / 1000),
           _embedded: {
-            leads: [
-              {
-                name: `AI-чат: ${leadData.name} | ${leadData.phone}`,
-              }
-            ],
-            contacts: [
-              {
-                name: leadData.name,
-                custom_fields_values: [
-                  {
-                    field_code: "PHONE",
-                    values: [{ value: leadData.phone, enum_code: "WORK" }]
-                  }
-                ]
-              }
-            ]
+            leads: [{ name: `AI-чат: ${leadData.name} | ${leadData.phone}` }],
+            contacts: [{
+              name: leadData.name,
+              custom_fields_values: [{
+                field_code: "PHONE",
+                values: [{ value: leadData.phone, enum_code: "WORK" }]
+              }]
+            }]
           },
           metadata: {
             form_id: "ai_assistant_form",
@@ -106,9 +95,8 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, submitLead } = await req.json();
+    const { messages, submitLead, colors, fills } = await req.json();
     
-    // If submitLead is provided, send to AMO CRM
     if (submitLead) {
       console.log("Submitting lead to AMO CRM:", submitLead);
       const success = await sendToAmoCRM(submitLead);
@@ -129,7 +117,14 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log("AI Assistant: Processing request with", messages.length, "messages");
+    // Build dynamic color and fill options
+    const colorOptions = colors && colors.length > 0 
+      ? colors.map((c: string, i: number) => `${i + 1}. ${c}`).join("\n")
+      : "1. Графит\n2. Коричневый\n3. Бежевый\n4. Терракот";
+    
+    const fillOptions = fills && fills.length > 0
+      ? fills.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n")
+      : "1. Профлист\n2. Штакетник\n3. Блоки БРИК";
 
     const systemPrompt = `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
 
@@ -139,8 +134,8 @@ serve(async (req) => {
 1. Ширину участка (в метрах)
 2. Желаемую высоту столбов
 3. Желаемую высоту цоколя  
-4. Тип заполнения
-5. Предпочтительный цвет
+4. Тип заполнения (ВАЖНО: когда спрашиваешь про заполнение, добавь в конце [SHOW_FILLS])
+5. Предпочтительный цвет столбов (ВАЖНО: когда спрашиваешь про цвет, добавь в конце [SHOW_COLORS])
 6. Нужны ли ворота и/или калитка
 7. Нужна ли архитектурная подсветка
 
@@ -155,9 +150,9 @@ serve(async (req) => {
 - НИКОГДА не используй звёздочки (*) или другое форматирование в ответах
 - Пиши простым текстом без выделений
 - Когда получишь имя и телефон, поблагодари и скажи что передашь заявку менеджеру
-- Если клиент выбирает "Позвоните мне", сразу переходи к запросу имени и телефона, пропуская оставшиеся вопросы
+- Если клиент выбирает "Позвоните мне", сразу переходи к запросу имени и телефона
 
-ФОРМАТ ВАРИАНТОВ (используй именно такой формат, всегда добавляй последним пункт "Позвоните мне"):
+ФОРМАТ ВАРИАНТОВ:
 Выберите высоту столбов:
 1. 2 метра
 2. 2.2 метра
@@ -165,7 +160,7 @@ serve(async (req) => {
 4. Свой вариант
 5. Позвоните мне
 
-СТАНДАРТНЫЕ ВАРИАНТЫ ДЛЯ ВОПРОСОВ:
+СТАНДАРТНЫЕ ВАРИАНТЫ:
 
 Высота столбов:
 1. 2 метра
@@ -181,20 +176,15 @@ serve(async (req) => {
 4. Свой вариант
 5. Позвоните мне
 
-Тип заполнения:
-1. Профлист (экономный вариант)
-2. Штакетник (классика)
-3. Блоки БРИК (премиум)
-4. Свой вариант
-5. Позвоните мне
+Тип заполнения (клиент увидит фотографии каждого варианта):
+${fillOptions}
+${fills && fills.length > 0 ? fills.length + 1 : 4}. Свой вариант
+${fills && fills.length > 0 ? fills.length + 2 : 5}. Позвоните мне
 
-Цвет:
-1. Графит
-2. Коричневый
-3. Бежевый
-4. Терракот
-5. Свой вариант
-6. Позвоните мне
+Цвет столбов (клиент увидит фотографии каждого цвета):
+${colorOptions}
+${colors && colors.length > 0 ? colors.length + 1 : 5}. Свой вариант
+${colors && colors.length > 0 ? colors.length + 2 : 6}. Позвоните мне
 
 Ворота и калитка:
 1. Да, нужны ворота и калитка
@@ -260,13 +250,19 @@ serve(async (req) => {
     const data = await response.json();
     let reply = data.choices?.[0]?.message?.content || "Извините, не удалось получить ответ.";
     
-    // Check if there's lead data to extract - use more robust regex
+    // Check for show colors/fills tags
+    const showColors = reply.includes("[SHOW_COLORS]");
+    const showFills = reply.includes("[SHOW_FILLS]");
+    
+    // Remove the tags from reply
+    reply = reply.replace(/\[SHOW_COLORS\]/g, "").replace(/\[SHOW_FILLS\]/g, "").trim();
+    
+    // Check if there's lead data to extract
     let leadData = null;
     const leadMatch = reply.match(/\[?LEAD_DATA\]?\s*(\{.*?\})\s*\[?\/?LEAD_DATA\]?/s);
     if (leadMatch) {
       try {
         leadData = JSON.parse(leadMatch[1]);
-        // Remove ALL LEAD_DATA related text from reply
         reply = reply
           .replace(/\[?LEAD_DATA\]?\s*\{.*?\}\s*\[?\/?LEAD_DATA\]?/gs, "")
           .replace(/LEAD_DATA/g, "")
@@ -275,7 +271,6 @@ serve(async (req) => {
         console.log("Extracted lead data:", leadData);
       } catch (e) {
         console.error("Failed to parse lead data:", e);
-        // Still try to clean up the text even if parsing fails
         reply = reply
           .replace(/\[?LEAD_DATA\]?.*?\[?\/?LEAD_DATA\]?/gs, "")
           .replace(/LEAD_DATA/g, "")
@@ -286,7 +281,7 @@ serve(async (req) => {
     console.log("AI Assistant: Response generated successfully");
 
     return new Response(
-      JSON.stringify({ reply, leadData }),
+      JSON.stringify({ reply, leadData, showColors, showFills }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
