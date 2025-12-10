@@ -2,8 +2,14 @@ import nightImage from "@/assets/night-lighting.jpg";
 import { Check } from "lucide-react";
 import ImageGallery from "./ImageGallery";
 import CTAButton from "./CTAButton";
+import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
 
 const LightingSection = () => {
+  const { photos } = useGalleryPhotos("lighting");
+  
+  // First photo is the big one, rest go to gallery
+  const mainPhoto = photos.length > 0 ? photos[0].image_url : nightImage;
+  
   const features = [
     "Встроена в столбы",
     "Не боится дождя и мороза",
@@ -17,7 +23,7 @@ const LightingSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-8">
           <div className="order-2 lg:order-1">
             <img
-              src={nightImage}
+              src={mainPhoto}
               alt="Архитектурная подсветка забора ночью"
               className="rounded-xl shadow-2xl w-full"
             />
@@ -39,7 +45,7 @@ const LightingSection = () => {
           </div>
         </div>
 
-        <ImageGallery sectionKey="lighting" />
+        <ImageGallery sectionKey="lighting" skipFirst />
         
         <div className="text-center">
           <CTAButton />

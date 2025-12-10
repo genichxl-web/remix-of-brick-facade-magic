@@ -3,8 +3,8 @@ export const gallerySections = [
   {
     key: "texture",
     name: "Натуральная текстура",
-    description: "Фотографии колотой текстуры блоков крупным планом",
-    requiredPhotos: 6,
+    description: "1 большое фото + 6 в галерее. Первое фото будет большим.",
+    requiredPhotos: 7,
     tips: "Снимайте при боковом освещении для передачи рельефа"
   },
   {
@@ -24,8 +24,8 @@ export const gallerySections = [
   {
     key: "lighting",
     name: "Архитектурная подсветка",
-    description: "Фотографии подсветки в тёмное время суток",
-    requiredPhotos: 6,
+    description: "1 большое фото + 6 в галерее. Первое фото будет большим.",
+    requiredPhotos: 7,
     tips: "Снимайте в сумерках для лучшего эффекта"
   },
   {
