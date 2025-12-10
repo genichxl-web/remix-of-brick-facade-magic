@@ -1,5 +1,7 @@
 import textureImage from "@/assets/texture-closeup.jpg";
 import { Check } from "lucide-react";
+import ImageGallery from "./ImageGallery";
+import CTAButton from "./CTAButton";
 
 const TextureSection = () => {
   const features = [
@@ -12,7 +14,7 @@ const TextureSection = () => {
   return (
     <section className="py-20 bg-card">
       <div className="container">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-8">
           <div>
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-8">
               🪨 Натуральная колотая фактура
@@ -41,6 +43,12 @@ const TextureSection = () => {
               className="rounded-xl shadow-xl w-full"
             />
           </div>
+        </div>
+
+        <ImageGallery />
+        
+        <div className="text-center">
+          <CTAButton />
         </div>
       </div>
     </section>

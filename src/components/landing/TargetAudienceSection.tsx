@@ -1,4 +1,6 @@
 import { Check } from "lucide-react";
+import ImageGallery from "./ImageGallery";
+import CTAButton from "./CTAButton";
 
 const TargetAudienceSection = () => {
   const points = [
@@ -29,6 +31,12 @@ const TargetAudienceSection = () => {
               </li>
             ))}
           </ul>
+        </div>
+
+        <ImageGallery />
+        
+        <div className="text-center">
+          <CTAButton />
         </div>
       </div>
     </section>
