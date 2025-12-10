@@ -2,8 +2,14 @@ import textureImage from "@/assets/texture-closeup.jpg";
 import { Check } from "lucide-react";
 import ImageGallery from "./ImageGallery";
 import CTAButton from "./CTAButton";
+import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
 
 const TextureSection = () => {
+  const { photos } = useGalleryPhotos("texture");
+  
+  // First photo is the big one, rest go to gallery
+  const mainPhoto = photos.length > 0 ? photos[0].image_url : textureImage;
+  
   const features = [
     "Каждый блок колотый, а не штампованный",
     "Все столбы разные — нет одинакового рисунка",
@@ -38,14 +44,14 @@ const TextureSection = () => {
           
           <div className="relative">
             <img
-              src={textureImage}
+              src={mainPhoto}
               alt="Натуральная колотая фактура блоков"
               className="rounded-xl shadow-xl w-full"
             />
           </div>
         </div>
 
-        <ImageGallery sectionKey="texture" />
+        <ImageGallery sectionKey="texture" skipFirst />
         
         <div className="text-center">
           <CTAButton />

@@ -6,17 +6,23 @@ import nightImage from "@/assets/night-lighting.jpg";
 interface ImageGalleryProps {
   sectionKey?: string;
   images?: string[];
+  skipFirst?: boolean; // Skip first photo (used when section has a big photo)
 }
 
 const defaultImages = [heroImage, textureImage, nightImage, heroImage, textureImage, nightImage];
 
-const ImageGallery = ({ sectionKey, images }: ImageGalleryProps) => {
+const ImageGallery = ({ sectionKey, images, skipFirst = false }: ImageGalleryProps) => {
   const { photos, loading } = useGalleryPhotos(sectionKey || "");
   
   // Use database photos if available, otherwise use provided images or defaults
-  const displayImages = photos.length > 0 
+  let displayImages = photos.length > 0 
     ? photos.map(p => p.image_url)
     : (images || defaultImages);
+  
+  // Skip first photo if requested (when section has a big featured photo)
+  if (skipFirst && photos.length > 0) {
+    displayImages = displayImages.slice(1);
+  }
 
   if (loading && sectionKey) {
     return (
