@@ -17,6 +17,7 @@ import ProcessSection from "@/components/landing/ProcessSection";
 import GeographySection from "@/components/landing/GeographySection";
 import ContactSection from "@/components/landing/ContactSection";
 import Footer from "@/components/landing/Footer";
+import AIAssistantWidget from "@/components/landing/AIAssistantWidget";
 
 const Index = () => {
   return (
@@ -42,6 +43,7 @@ const Index = () => {
         <ContactSection />
       </main>
       <Footer />
+      <AIAssistantWidget />
     </div>
   );
 };
