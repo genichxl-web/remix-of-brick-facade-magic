@@ -9,13 +9,14 @@ const AIAssistantWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: "Здравствуйте! Я AI-ассистент БРИК. Чем могу помочь? Задайте вопрос о наших заборах, ценах или услугах." }
+    { role: "assistant", content: "Здравствуйте! Я AI-ассистент БРИК. Давайте рассчитаем стоимость забора для вашего участка. Подскажите, какова ширина участка в метрах?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
   const { toast } = useToast();
 
   const handleSend = async () => {
-    if (!message.trim() || isLoading) return;
+    if (!message.trim() || isLoading || leadSubmitted) return;
 
     const userMessage = message.trim();
     setMessage("");
@@ -36,10 +37,32 @@ const AIAssistantWidget = () => {
           description: data.error,
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
-      setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+      // If lead data is extracted, submit it to AMO CRM
+      if (data?.leadData) {
+        console.log("Lead data detected, submitting to AMO CRM:", data.leadData);
+        
+        const { data: submitData, error: submitError } = await supabase.functions.invoke("ai-assistant", {
+          body: { submitLead: data.leadData }
+        });
+
+        if (submitError) {
+          console.error("Failed to submit lead:", submitError);
+        } else if (submitData?.leadSubmitted) {
+          setLeadSubmitted(true);
+          toast({
+            title: "Заявка отправлена!",
+            description: "Наш менеджер свяжется с вами в ближайшее время.",
+          });
+        }
+
+        setMessages(prev => [...prev, { role: "assistant", content: submitData?.reply || data.reply }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+      }
     } catch (error) {
       console.error("AI Assistant error:", error);
       toast({
@@ -111,24 +134,30 @@ const AIAssistantWidget = () => {
 
           {/* Input */}
           <div className="p-4 border-t border-border bg-card">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSend();
-              }}
-              className="flex gap-2"
-            >
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Введите сообщение..."
-                className="flex-1"
-                disabled={isLoading}
-              />
-              <Button type="submit" size="icon" disabled={isLoading || !message.trim()}>
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
+            {leadSubmitted ? (
+              <p className="text-sm text-center text-muted-foreground">
+                Заявка отправлена. Ожидайте звонка менеджера!
+              </p>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSend();
+                }}
+                className="flex gap-2"
+              >
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Введите сообщение..."
+                  className="flex-1"
+                  disabled={isLoading}
+                />
+                <Button type="submit" size="icon" disabled={isLoading || !message.trim()}>
+                  <Send className="w-4 h-4" />
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       )}
