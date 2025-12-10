@@ -33,7 +33,7 @@ const TargetAudienceSection = () => {
           </ul>
         </div>
 
-        <ImageGallery sectionKey="portfolio" />
+        <ImageGallery sectionKey="target" />
         
         <div className="text-center">
           <CTAButton />
