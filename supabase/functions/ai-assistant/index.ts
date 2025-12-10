@@ -5,13 +5,120 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function sendToAmoCRM(leadData: {
+  name: string;
+  phone: string;
+  width?: string;
+  pillarHeight?: string;
+  baseHeight?: string;
+  fillType?: string;
+  color?: string;
+  gates?: string;
+  lighting?: string;
+}) {
+  const subdomain = Deno.env.get("AMO_CRM_SUBDOMAIN");
+  const accessToken = Deno.env.get("AMO_CRM_ACCESS_TOKEN");
+
+  if (!subdomain || !accessToken) {
+    console.error("AMO CRM credentials not configured");
+    return false;
+  }
+
+  const noteText = `
+Заявка от AI-ассистента:
+- Ширина участка: ${leadData.width || "не указано"}
+- Высота столбов: ${leadData.pillarHeight || "не указано"}
+- Высота цоколя: ${leadData.baseHeight || "не указано"}
+- Тип заполнения: ${leadData.fillType || "не указано"}
+- Цвет: ${leadData.color || "не указано"}
+- Ворота/калитка: ${leadData.gates || "не указано"}
+- Подсветка: ${leadData.lighting || "не указано"}
+  `.trim();
+
+  try {
+    const response = await fetch(`https://${subdomain}.amocrm.ru/api/v4/leads/unsorted/forms`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([
+        {
+          source_uid: `ai_assistant_${Date.now()}`,
+          source_name: "AI-Ассистент БРИК",
+          created_at: Math.floor(Date.now() / 1000),
+          _embedded: {
+            leads: [
+              {
+                name: `AI-чат: ${leadData.name}`,
+                custom_fields_values: [
+                  {
+                    field_id: 123, // Replace with actual field ID or remove if not needed
+                    values: [{ value: noteText }]
+                  }
+                ]
+              }
+            ],
+            contacts: [
+              {
+                name: leadData.name,
+                custom_fields_values: [
+                  {
+                    field_code: "PHONE",
+                    values: [{ value: leadData.phone, enum_code: "WORK" }]
+                  }
+                ]
+              }
+            ]
+          },
+          metadata: {
+            form_id: "ai_assistant_form",
+            form_name: "AI-Ассистент БРИК",
+            form_page: "https://brik-fence.ru",
+            form_sent_at: Math.floor(Date.now() / 1000),
+            ip: "127.0.0.1"
+          }
+        }
+      ])
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AMO CRM error:", response.status, errorText);
+      return false;
+    }
+
+    console.log("Lead sent to AMO CRM successfully");
+    return true;
+  } catch (error) {
+    console.error("AMO CRM request failed:", error);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, submitLead } = await req.json();
+    
+    // If submitLead is provided, send to AMO CRM
+    if (submitLead) {
+      console.log("Submitting lead to AMO CRM:", submitLead);
+      const success = await sendToAmoCRM(submitLead);
+      return new Response(
+        JSON.stringify({ 
+          leadSubmitted: success,
+          reply: success 
+            ? "Отлично! Я передал вашу заявку нашим специалистам. Они свяжутся с вами в ближайшее время для уточнения деталей и расчёта стоимости. Спасибо за интерес к заборам БРИК!" 
+            : "Произошла ошибка при отправке заявки. Пожалуйста, попробуйте оставить заявку через форму на сайте или позвоните нам."
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -19,6 +126,49 @@ serve(async (req) => {
     }
 
     console.log("AI Assistant: Processing request with", messages.length, "messages");
+
+    const systemPrompt = `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
+
+ТВОЯ ГЛАВНАЯ ЗАДАЧА: Собрать информацию для расчёта стоимости забора.
+
+Для точного расчёта тебе нужно узнать:
+1. Ширину участка (в метрах)
+2. Желаемую высоту столбов
+3. Желаемую высоту цоколя  
+4. Тип заполнения (профлист, штакетник, блоки БРИК)
+5. Предпочтительный цвет
+6. Нужны ли ворота и/или калитка
+7. Нужна ли архитектурная подсветка
+
+После сбора всех параметров, попроси:
+8. Имя клиента
+9. Номер телефона для связи
+
+ВАЖНЫЕ ПРАВИЛА:
+- Задавай вопросы по одному, не все сразу
+- Будь дружелюбным и кратким
+- Если клиент не знает какой-то параметр, предложи стандартные варианты
+- Когда получишь имя и телефон, поблагодари и скажи что передашь заявку менеджеру
+
+СТАНДАРТНЫЕ ВАРИАНТЫ:
+- Высота столбов: 2м, 2.2м, 2.5м
+- Высота цоколя: 20см, 30см, 40см
+- Типы заполнения: профлист (экономно), штакетник (классика), блоки БРИК (премиум)
+- Цвета: графит, коричневый, бежевый, терракот
+
+ИНФОРМАЦИЯ О ПРОДУКТЕ:
+- Система "ЛИЦЕВОЙ ЗАБОР БРИК" — премиальное ограждение с натуральной колотой текстурой
+- Монолитные армированные столбы (не пустотелые)
+- Встроенная архитектурная подсветка
+- Красивый с обеих сторон (симметрия 360°)
+- На 20-30% дешевле кирпичного забора
+
+География работы: Москва и Московская область
+
+ВАЖНО: Когда клиент даёт номер телефона, в конце своего ответа добавь специальный тег:
+[LEAD_DATA]{"name":"имя","phone":"телефон","width":"ширина","pillarHeight":"высота столбов","baseHeight":"высота цоколя","fillType":"тип заполнения","color":"цвет","gates":"ворота/калитка","lighting":"подсветка"}[/LEAD_DATA]
+
+Заполни все поля из собранной информации. Если какой-то параметр не был указан, напиши "не указано".`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -29,24 +179,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { 
-            role: "system", 
-            content: `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
-
-Информация о продукте:
-- Система "ЛИЦЕВОЙ ЗАБОР БРИК" — это премиальное ограждение с натуральной колотой текстурой
-- Каждый блок уникален, текстура не повторяется
-- Монолитные армированные столбы (не пустотелые)
-- Заводской фундамент с жёсткой геометрией
-- Встроенная архитектурная подсветка в столбах
-- Красивый с обеих сторон (симметрия 360°)
-- Автоматические откатные ворота и встроенная калитка
-- На 20-30% дешевле кирпичного забора, но выглядит дороже
-
-География работы: Москва и Московская область
-
-Твоя задача: отвечать на вопросы клиентов кратко, дружелюбно и информативно. Если нужна детальная консультация — предложи оставить заявку или позвонить.`
-          },
+          { role: "system", content: systemPrompt },
           ...messages,
         ],
       }),
@@ -73,12 +206,25 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Извините, не удалось получить ответ.";
+    let reply = data.choices?.[0]?.message?.content || "Извините, не удалось получить ответ.";
     
+    // Check if there's lead data to extract
+    let leadData = null;
+    const leadMatch = reply.match(/\[LEAD_DATA\](.*?)\[\/LEAD_DATA\]/s);
+    if (leadMatch) {
+      try {
+        leadData = JSON.parse(leadMatch[1]);
+        reply = reply.replace(/\[LEAD_DATA\].*?\[\/LEAD_DATA\]/s, "").trim();
+        console.log("Extracted lead data:", leadData);
+      } catch (e) {
+        console.error("Failed to parse lead data:", e);
+      }
+    }
+
     console.log("AI Assistant: Response generated successfully");
 
     return new Response(
-      JSON.stringify({ reply }),
+      JSON.stringify({ reply, leadData }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
