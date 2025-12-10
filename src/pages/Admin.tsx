@@ -62,15 +62,30 @@ const Admin = () => {
     }
   };
 
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
   const handleUpload = async (sectionKey: string, files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     setUploading(sectionKey);
     const currentPhotos = photosBySection[sectionKey] || [];
+    let uploadedCount = 0;
     
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      
+      // Validate file type
+      if (!ALLOWED_TYPES.includes(file.type) && !ALLOWED_EXTENSIONS.includes(fileExt || '')) {
+        toast({
+          title: "Неподдерживаемый формат",
+          description: `Файл "${file.name}" имеет неподдерживаемый формат. Используйте JPG, PNG или WebP.`,
+          variant: "destructive"
+        });
+        continue;
+      }
+
       const fileName = `${sectionKey}/${Date.now()}-${i}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
@@ -104,13 +119,17 @@ const Admin = () => {
           description: dbError.message,
           variant: "destructive"
         });
+      } else {
+        uploadedCount++;
       }
     }
 
-    toast({
-      title: "Фото загружены",
-      description: `Загружено ${files.length} фото`
-    });
+    if (uploadedCount > 0) {
+      toast({
+        title: "Фото загружены",
+        description: `Загружено ${uploadedCount} фото`
+      });
+    }
 
     setUploading(null);
     fetchAllPhotos();
@@ -216,7 +235,7 @@ const Admin = () => {
                     <label className="cursor-pointer">
                       <input
                         type="file"
-                        accept="image/*"
+                        accept=".jpg,.jpeg,.png,.webp,.gif"
                         multiple
                         className="hidden"
                         onChange={(e) => handleUpload(section.key, e.target.files)}
