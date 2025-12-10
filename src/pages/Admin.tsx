@@ -4,9 +4,10 @@ import { gallerySections } from "@/lib/gallerySections";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers } from "lucide-react";
+import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers, Bot, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GalleryPhoto {
@@ -39,6 +40,8 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [newColorName, setNewColorName] = useState("");
   const [newFillName, setNewFillName] = useState("");
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [savingPrompt, setSavingPrompt] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -51,6 +54,7 @@ const Admin = () => {
       fetchAllPhotos();
       fetchPillarColors();
       fetchFillTypes();
+      fetchAiPrompt();
     }
   }, [isAuthenticated]);
 
@@ -86,6 +90,30 @@ const Admin = () => {
       .select("*")
       .order("display_order", { ascending: true });
     if (data) setFillTypes(data);
+  };
+
+  const fetchAiPrompt = async () => {
+    const { data } = await supabase
+      .from("ai_settings")
+      .select("value")
+      .eq("key", "system_prompt")
+      .single();
+    if (data) setAiPrompt(data.value);
+  };
+
+  const saveAiPrompt = async () => {
+    setSavingPrompt(true);
+    const { error } = await supabase
+      .from("ai_settings")
+      .update({ value: aiPrompt, updated_at: new Date().toISOString() })
+      .eq("key", "system_prompt");
+    
+    if (error) {
+      toast({ title: "Ошибка сохранения", variant: "destructive" });
+    } else {
+      toast({ title: "Промт сохранён" });
+    }
+    setSavingPrompt(false);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -298,7 +326,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="gallery" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="gallery" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
               Галерея
@@ -310,6 +338,10 @@ const Admin = () => {
             <TabsTrigger value="fills" className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
               Заполнения ({fillTypes.length}/6)
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              AI Промт
             </TabsTrigger>
           </TabsList>
 
@@ -502,6 +534,34 @@ const Admin = () => {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ai">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Системный промт AI-ассистента
+                </CardTitle>
+                <CardDescription>
+                  Настройте поведение AI-ассистента. Промт определяет как бот общается с клиентами.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Textarea
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="Введите системный промт для AI..."
+                  className="min-h-[400px] font-mono text-sm"
+                />
+                <div className="flex justify-end">
+                  <Button onClick={saveAiPrompt} disabled={savingPrompt}>
+                    <Save className="h-4 w-4 mr-2" />
+                    {savingPrompt ? "Сохранение..." : "Сохранить промт"}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
