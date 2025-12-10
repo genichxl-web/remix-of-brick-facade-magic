@@ -80,7 +80,7 @@ async function sendToAmoCRM(leadData: {
             form_page: "https://brik-fence.ru",
             form_sent_at: Math.floor(Date.now() / 1000),
             ip: "127.0.0.1",
-            form_data: noteText
+            referer: noteText.substring(0, 255)
           }
         }
       ])
