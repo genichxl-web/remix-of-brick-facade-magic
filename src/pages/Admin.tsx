@@ -48,6 +48,71 @@ const Admin = () => {
   const ADMIN_PASSWORD = "0000";
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+
+  const compressImage = async (file: File, maxSizeBytes: number = MAX_FILE_SIZE): Promise<File> => {
+    // If file is already small enough, return as-is
+    if (file.size <= maxSizeBytes) return file;
+
+    return new Promise((resolve) => {
+      const img = document.createElement('img');
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        
+        // Calculate scale factor based on file size ratio
+        const sizeRatio = maxSizeBytes / file.size;
+        const scaleFactor = Math.sqrt(sizeRatio) * 0.9; // 0.9 for safety margin
+        
+        width = Math.floor(width * scaleFactor);
+        height = Math.floor(height * scaleFactor);
+        
+        // Ensure minimum dimensions
+        width = Math.max(width, 100);
+        height = Math.max(height, 100);
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Try different quality levels
+        const tryCompress = (quality: number) => {
+          canvas.toBlob(
+            (blob) => {
+              if (blob && blob.size <= maxSizeBytes) {
+                const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                resolve(compressedFile);
+              } else if (quality > 0.3) {
+                tryCompress(quality - 0.1);
+              } else {
+                // Last resort: further reduce dimensions
+                const smallerCanvas = document.createElement('canvas');
+                smallerCanvas.width = Math.floor(width * 0.7);
+                smallerCanvas.height = Math.floor(height * 0.7);
+                const smallerCtx = smallerCanvas.getContext('2d');
+                smallerCtx?.drawImage(canvas, 0, 0, smallerCanvas.width, smallerCanvas.height);
+                smallerCanvas.toBlob(
+                  (smallBlob) => {
+                    const compressedFile = new File([smallBlob || blob!], file.name, { type: 'image/jpeg' });
+                    resolve(compressedFile);
+                  },
+                  'image/jpeg',
+                  0.7
+                );
+              }
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        
+        tryCompress(0.85);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -149,12 +214,13 @@ const Admin = () => {
       const file = files[i];
       if (!validateFile(file)) continue;
 
-      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const compressedFile = await compressImage(file);
+      const fileExt = 'jpg'; // Always jpg after compression
       const fileName = `${sectionKey}/${Date.now()}-${i}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from("gallery")
-        .upload(fileName, file);
+        .upload(fileName, compressedFile);
 
       if (uploadError) {
         toast({ title: "Ошибка загрузки", description: uploadError.message, variant: "destructive" });
@@ -204,10 +270,10 @@ const Admin = () => {
     if (!validateFile(file)) return;
 
     setUploading("color");
-    const fileExt = file.name.split('.').pop()?.toLowerCase();
-    const fileName = `colors/${Date.now()}.${fileExt}`;
+    const compressedFile = await compressImage(file);
+    const fileName = `colors/${Date.now()}.jpg`;
 
-    const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, file);
+    const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, compressedFile);
     if (uploadError) {
       toast({ title: "Ошибка загрузки", description: uploadError.message, variant: "destructive" });
       setUploading(null);
@@ -244,10 +310,10 @@ const Admin = () => {
       const colorName = file.name.replace(/\.[^/.]+$/, "").trim();
       if (!colorName) continue;
 
-      const fileExt = file.name.split('.').pop()?.toLowerCase();
-      const fileName = `colors/${Date.now()}-${i}.${fileExt}`;
+      const compressedFile = await compressImage(file);
+      const fileName = `colors/${Date.now()}-${i}.jpg`;
 
-      const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, compressedFile);
       if (uploadError) continue;
 
       const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(fileName);
@@ -276,10 +342,10 @@ const Admin = () => {
     if (!validateFile(file)) return;
 
     setUploading("fill");
-    const fileExt = file.name.split('.').pop()?.toLowerCase();
-    const fileName = `fills/${Date.now()}.${fileExt}`;
+    const compressedFile = await compressImage(file);
+    const fileName = `fills/${Date.now()}.jpg`;
 
-    const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, file);
+    const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, compressedFile);
     if (uploadError) {
       toast({ title: "Ошибка загрузки", description: uploadError.message, variant: "destructive" });
       setUploading(null);
