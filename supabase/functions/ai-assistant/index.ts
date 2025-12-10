@@ -16,8 +16,17 @@ async function sendToAmoCRM(leadData: {
   gates?: string;
   lighting?: string;
 }) {
-  const subdomain = Deno.env.get("AMO_CRM_SUBDOMAIN");
+  let subdomain = Deno.env.get("AMO_CRM_SUBDOMAIN") || "";
   const accessToken = Deno.env.get("AMO_CRM_ACCESS_TOKEN");
+
+  // Clean subdomain - remove https://, http://, .amocrm.ru, trailing slashes
+  subdomain = subdomain
+    .replace(/^https?:\/\//i, "")
+    .replace(/\.amocrm\.ru.*$/i, "")
+    .replace(/\//g, "")
+    .trim();
+
+  console.log("Cleaned AMO CRM subdomain:", subdomain);
 
   if (!subdomain || !accessToken) {
     console.error("AMO CRM credentials not configured");
