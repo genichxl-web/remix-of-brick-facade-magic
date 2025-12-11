@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers, Bot, Save } from "lucide-react";
+import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers, Bot, Save, Briefcase, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GalleryPhoto {
@@ -39,13 +39,32 @@ interface SectionText {
   description: string | null;
 }
 
+interface PortfolioPhoto {
+  id: string;
+  project_id: string;
+  image_url: string;
+  display_order: number;
+}
+
+interface PortfolioProject {
+  id: string;
+  title: string;
+  location: string | null;
+  description: string | null;
+  display_order: number | null;
+  photos: PortfolioPhoto[];
+}
+
 const Admin = () => {
   const [photosBySection, setPhotosBySection] = useState<Record<string, GalleryPhoto[]>>({});
   const [sectionTexts, setSectionTexts] = useState<Record<string, SectionText>>({});
   const [pillarColors, setPillarColors] = useState<PillarColor[]>([]);
   const [fillTypes, setFillTypes] = useState<FillType[]>([]);
+  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
+  const [expandedProject, setExpandedProject] = useState<string | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
   const [savingText, setSavingText] = useState<string | null>(null);
+  const [savingProject, setSavingProject] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [newColorName, setNewColorName] = useState("");
@@ -131,6 +150,7 @@ const Admin = () => {
       fetchPillarColors();
       fetchFillTypes();
       fetchAiPrompt();
+      fetchPortfolioProjects();
     }
   }, [isAuthenticated]);
 
@@ -223,6 +243,127 @@ const Admin = () => {
       .eq("key", "system_prompt")
       .single();
     if (data) setAiPrompt(data.value);
+  };
+
+  const fetchPortfolioProjects = async () => {
+    const { data: projectsData } = await supabase
+      .from("portfolio_projects")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    if (!projectsData) return;
+
+    const { data: photosData } = await supabase
+      .from("portfolio_photos")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    const projectsWithPhotos = projectsData.map(project => ({
+      ...project,
+      photos: (photosData || []).filter(photo => photo.project_id === project.id)
+    }));
+
+    setPortfolioProjects(projectsWithPhotos);
+  };
+
+  const addPortfolioProject = async () => {
+    const { error } = await supabase.from("portfolio_projects").insert({
+      title: "Новый проект",
+      display_order: portfolioProjects.length
+    });
+    if (!error) {
+      toast({ title: "Проект добавлен" });
+      fetchPortfolioProjects();
+    }
+  };
+
+  const updatePortfolioProject = async (projectId: string, field: string, value: string) => {
+    setPortfolioProjects(prev => prev.map(p => 
+      p.id === projectId ? { ...p, [field]: value } : p
+    ));
+  };
+
+  const savePortfolioProject = async (project: PortfolioProject) => {
+    setSavingProject(project.id);
+    const { error } = await supabase
+      .from("portfolio_projects")
+      .update({ 
+        title: project.title, 
+        location: project.location, 
+        description: project.description 
+      })
+      .eq("id", project.id);
+    
+    if (error) {
+      toast({ title: "Ошибка сохранения", variant: "destructive" });
+    } else {
+      toast({ title: "Проект сохранён" });
+    }
+    setSavingProject(null);
+  };
+
+  const deletePortfolioProject = async (projectId: string) => {
+    // Photos will be deleted by CASCADE
+    const { error } = await supabase.from("portfolio_projects").delete().eq("id", projectId);
+    if (!error) {
+      toast({ title: "Проект удалён" });
+      fetchPortfolioProjects();
+    }
+  };
+
+  const handlePortfolioPhotoUpload = async (projectId: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const project = portfolioProjects.find(p => p.id === projectId);
+    if (!project) return;
+
+    setUploading(`portfolio-${projectId}`);
+    let uploadedCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      if (project.photos.length + uploadedCount >= 8) break;
+      
+      const file = files[i];
+      if (!validateFile(file)) continue;
+
+      const compressedFile = await compressImage(file);
+      const fileName = `portfolio/${projectId}/${Date.now()}-${i}.jpg`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("gallery")
+        .upload(fileName, compressedFile);
+
+      if (uploadError) continue;
+
+      const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(fileName);
+
+      const { error: dbError } = await supabase.from("portfolio_photos").insert({
+        project_id: projectId,
+        image_url: urlData.publicUrl,
+        display_order: project.photos.length + uploadedCount
+      });
+
+      if (!dbError) uploadedCount++;
+    }
+
+    if (uploadedCount > 0) {
+      toast({ title: `Загружено ${uploadedCount} фото` });
+    }
+
+    setUploading(null);
+    fetchPortfolioProjects();
+  };
+
+  const deletePortfolioPhoto = async (photo: PortfolioPhoto) => {
+    const urlParts = photo.image_url.split("/gallery/");
+    if (urlParts[1]) {
+      await supabase.storage.from("gallery").remove([urlParts[1]]);
+    }
+    const { error } = await supabase.from("portfolio_photos").delete().eq("id", photo.id);
+    if (!error) {
+      toast({ title: "Фото удалено" });
+      fetchPortfolioProjects();
+    }
   };
 
   const saveAiPrompt = async () => {
@@ -488,8 +629,12 @@ const Admin = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="gallery" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="portfolio" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="portfolio" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Портфолио ({portfolioProjects.length}/20)
+            </TabsTrigger>
             <TabsTrigger value="gallery" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
               Галерея
@@ -507,6 +652,154 @@ const Admin = () => {
               AI Промт
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="portfolio" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Briefcase className="h-5 w-5" />
+                      Управление портфолио
+                    </CardTitle>
+                    <CardDescription>Добавьте до 20 проектов. Каждый проект может содержать до 8 фотографий.</CardDescription>
+                  </div>
+                  {portfolioProjects.length < 20 && (
+                    <Button onClick={addPortfolioProject}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Добавить проект
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {portfolioProjects.length === 0 ? (
+                  <div className="flex items-center justify-center h-32 border-2 border-dashed rounded-lg text-muted-foreground">
+                    <div className="text-center">
+                      <Briefcase className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>Нет проектов в портфолио</p>
+                    </div>
+                  </div>
+                ) : (
+                  portfolioProjects.map((project, index) => (
+                    <Card key={project.id} className="border">
+                      <CardHeader className="pb-2">
+                        <div 
+                          className="flex items-center justify-between cursor-pointer"
+                          onClick={() => setExpandedProject(expandedProject === project.id ? null : project.id)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-muted-foreground font-mono">#{index + 1}</span>
+                            <div>
+                              <h4 className="font-medium">{project.title || "Без названия"}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {project.location || "Локация не указана"} • {project.photos.length}/8 фото
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={(e) => { e.stopPropagation(); deletePortfolioProject(project.id); }}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                            {expandedProject === project.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      
+                      {expandedProject === project.id && (
+                        <CardContent className="space-y-4 pt-4 border-t">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-sm font-medium mb-1 block">Название проекта</label>
+                              <Input
+                                value={project.title || ""}
+                                onChange={(e) => updatePortfolioProject(project.id, 'title', e.target.value)}
+                                placeholder="Например: Забор 32 м, автоматические ворота"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium mb-1 block">Поселок / Локация</label>
+                              <Input
+                                value={project.location || ""}
+                                onChange={(e) => updatePortfolioProject(project.id, 'location', e.target.value)}
+                                placeholder="Например: КП «Новорижский»"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Описание</label>
+                            <Textarea
+                              value={project.description || ""}
+                              onChange={(e) => updatePortfolioProject(project.id, 'description', e.target.value)}
+                              placeholder="Подробное описание проекта..."
+                              className="min-h-[100px]"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <Button 
+                              size="sm" 
+                              onClick={() => savePortfolioProject(project)}
+                              disabled={savingProject === project.id}
+                            >
+                              <Save className="h-4 w-4 mr-2" />
+                              {savingProject === project.id ? "Сохранение..." : "Сохранить"}
+                            </Button>
+                          </div>
+
+                          <div className="pt-4 border-t">
+                            <div className="flex items-center justify-between mb-3">
+                              <label className="text-sm font-medium">Фотографии проекта ({project.photos.length}/8)</label>
+                              {project.photos.length < 8 && (
+                                <label className="cursor-pointer">
+                                  <input
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => handlePortfolioPhotoUpload(project.id, e.target.files)}
+                                    disabled={uploading === `portfolio-${project.id}`}
+                                  />
+                                  <Button variant="outline" size="sm" disabled={uploading === `portfolio-${project.id}`} asChild>
+                                    <span>
+                                      <Upload className="h-4 w-4 mr-2" />
+                                      {uploading === `portfolio-${project.id}` ? "Загрузка..." : "Загрузить фото"}
+                                    </span>
+                                  </Button>
+                                </label>
+                              )}
+                            </div>
+                            {project.photos.length > 0 ? (
+                              <div className="grid grid-cols-4 gap-2">
+                                {project.photos.map((photo) => (
+                                  <div key={photo.id} className="relative group aspect-video">
+                                    <img src={photo.image_url} alt="" className="w-full h-full object-cover rounded-lg" />
+                                    <button
+                                      onClick={() => deletePortfolioPhoto(photo)}
+                                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center h-20 border-2 border-dashed rounded-lg text-muted-foreground text-sm">
+                                Нет фотографий
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      )}
+                    </Card>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="gallery" className="space-y-6">
             {gallerySections.map((section) => {
