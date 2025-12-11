@@ -46,8 +46,8 @@ const Admin = () => {
   const navigate = useNavigate();
 
   const ADMIN_PASSWORD = "0000";
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
   const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
   const compressImage = async (file: File, maxSizeBytes: number = MAX_FILE_SIZE): Promise<File> => {
@@ -478,7 +478,7 @@ const Admin = () => {
                       <label className="cursor-pointer">
                         <input
                           type="file"
-                          accept=".jpg,.jpeg,.png,.webp,.gif"
+                          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                           multiple
                           className="hidden"
                           onChange={(e) => handleUpload(section.key, e.target.files)}
@@ -540,7 +540,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && handleColorUpload(e.target.files[0])}
                       disabled={uploading === "color" || !newColorName.trim()}
@@ -552,7 +552,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                       multiple
                       className="hidden"
                       onChange={(e) => handleBulkColorUpload(e.target.files)}
@@ -616,7 +616,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && handleFillUpload(e.target.files[0])}
                       disabled={uploading === "fill" || !newFillName.trim()}
