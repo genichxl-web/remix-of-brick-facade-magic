@@ -31,11 +31,21 @@ interface FillType {
   display_order: number;
 }
 
+interface SectionText {
+  id: string;
+  section_key: string;
+  title: string | null;
+  subtitle: string | null;
+  description: string | null;
+}
+
 const Admin = () => {
   const [photosBySection, setPhotosBySection] = useState<Record<string, GalleryPhoto[]>>({});
+  const [sectionTexts, setSectionTexts] = useState<Record<string, SectionText>>({});
   const [pillarColors, setPillarColors] = useState<PillarColor[]>([]);
   const [fillTypes, setFillTypes] = useState<FillType[]>([]);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [savingText, setSavingText] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [newColorName, setNewColorName] = useState("");
@@ -117,6 +127,7 @@ const Admin = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchAllPhotos();
+      fetchSectionTexts();
       fetchPillarColors();
       fetchFillTypes();
       fetchAiPrompt();
@@ -139,6 +150,54 @@ const Admin = () => {
       }, {} as Record<string, GalleryPhoto[]>);
       setPhotosBySection(grouped);
     }
+  };
+
+  const fetchSectionTexts = async () => {
+    const { data } = await supabase
+      .from("section_texts")
+      .select("*");
+    if (data) {
+      const grouped = data.reduce((acc, text) => {
+        acc[text.section_key] = text;
+        return acc;
+      }, {} as Record<string, SectionText>);
+      setSectionTexts(grouped);
+    }
+  };
+
+  const updateSectionText = async (sectionKey: string, field: 'title' | 'subtitle' | 'description', value: string) => {
+    setSectionTexts(prev => ({
+      ...prev,
+      [sectionKey]: {
+        ...prev[sectionKey],
+        [field]: value
+      }
+    }));
+  };
+
+  const saveSectionText = async (sectionKey: string) => {
+    setSavingText(sectionKey);
+    const text = sectionTexts[sectionKey];
+    if (!text) {
+      setSavingText(null);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("section_texts")
+      .update({ 
+        title: text.title, 
+        subtitle: text.subtitle, 
+        description: text.description 
+      })
+      .eq("section_key", sectionKey);
+
+    if (error) {
+      toast({ title: "Ошибка сохранения", variant: "destructive" });
+    } else {
+      toast({ title: "Тексты сохранены" });
+    }
+    setSavingText(null);
   };
 
   const fetchPillarColors = async () => {
@@ -452,6 +511,7 @@ const Admin = () => {
           <TabsContent value="gallery" className="space-y-6">
             {gallerySections.map((section) => {
               const photos = photosBySection[section.key] || [];
+              const sectionText = sectionTexts[section.key];
               const isComplete = photos.length >= section.requiredPhotos;
               
               return (
@@ -473,8 +533,43 @@ const Admin = () => {
                     </div>
                     <p className="text-sm text-muted-foreground mt-2 bg-muted p-2 rounded">💡 {section.tips}</p>
                   </CardHeader>
-                  <CardContent>
-                    <div className="mb-4">
+                  <CardContent className="space-y-4">
+                    {/* Text editing fields */}
+                    {sectionText && (
+                      <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Заголовок</label>
+                            <Input
+                              value={sectionText.title || ""}
+                              onChange={(e) => updateSectionText(section.key, 'title', e.target.value)}
+                              placeholder="Заголовок раздела"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Подзаголовок</label>
+                            <Input
+                              value={sectionText.subtitle || ""}
+                              onChange={(e) => updateSectionText(section.key, 'subtitle', e.target.value)}
+                              placeholder="Подзаголовок раздела"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-end">
+                          <Button 
+                            size="sm" 
+                            onClick={() => saveSectionText(section.key)}
+                            disabled={savingText === section.key}
+                          >
+                            <Save className="h-4 w-4 mr-2" />
+                            {savingText === section.key ? "Сохранение..." : "Сохранить тексты"}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Photo upload */}
+                    <div>
                       <label className="cursor-pointer">
                         <input
                           type="file"
