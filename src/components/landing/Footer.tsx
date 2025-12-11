@@ -1,8 +1,6 @@
 import { Phone, Mail, MapPin } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="py-12 bg-card border-t border-border">
+  return <footer className="py-12 bg-card border-t border-border">
       <div className="container">
         <div className="grid md:grid-cols-3 gap-8">
           <div>
@@ -17,16 +15,14 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Контакты</h3>
             <div className="space-y-3">
-              <a href="tel:+79991234567" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
-                <Phone className="w-4 h-4" />
+              <a href="tel:+79991234567" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">+7 960 573 17 23<Phone className="w-4 h-4" />
                 +7 (999) 123-45-67
               </a>
               <a href="mailto:info@brik-zabor.ru" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="w-4 h-4" />
                 info@brik-zabor.ru
               </a>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-muted-foreground">Офис и шоурум в г. Рязань, по адресу с.Дядьково 3, рядом с Лемана ПРО (Леруа Мерлен) <MapPin className="w-4 h-4" />
                 Московская область
               </div>
             </div>
@@ -46,8 +42,6 @@ const Footer = () => {
           © 2024 БРИК. Все права защищены.
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
