@@ -62,6 +62,13 @@ export const gallerySections = [
     description: "Главная фотография для верхней части сайта",
     requiredPhotos: 1,
     tips: "Панорамное фото лучшего забора"
+  },
+  {
+    key: "reviews",
+    name: "Отзывы клиентов",
+    description: "Скриншоты отзывов из мессенджеров (вертикальные фото)",
+    requiredPhotos: 6,
+    tips: "Загружайте вертикальные скриншоты из WhatsApp, Telegram и т.д."
   }
 ] as const;
 
