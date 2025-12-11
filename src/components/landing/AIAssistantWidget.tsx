@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ const AIAssistantWidget = () => {
   const [fillTypes, setFillTypes] = useState<FillType[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -110,10 +112,13 @@ const AIAssistantWidget = () => {
           console.error("Failed to submit lead:", submitError);
         } else if (submitData?.leadSubmitted) {
           setLeadSubmitted(true);
-          toast({
-            title: "Заявка отправлена!",
-            description: "Наш менеджер свяжется с вами в ближайшее время.",
-          });
+          setMessages(prev => [...prev, { role: "assistant", content: submitData?.reply || data.reply }]);
+          // Navigate to thank you page after a short delay to show the message
+          setTimeout(() => {
+            navigate("/thank-you");
+          }, 1500);
+          setIsLoading(false);
+          return;
         }
 
         setMessages(prev => [...prev, { role: "assistant", content: submitData?.reply || data.reply }]);
