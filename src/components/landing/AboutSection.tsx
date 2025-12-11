@@ -1,4 +1,6 @@
-import { Factory, Camera, MapPin } from "lucide-react";
+import { Factory, Camera, MapPin, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 const AboutSection = () => {
   const features = [
     {
@@ -41,6 +43,17 @@ const AboutSection = () => {
                 </div>
               );
             })}
+          </div>
+
+          <div className="flex justify-center mt-10">
+            <Button 
+              size="lg" 
+              className="gap-2"
+              onClick={() => window.open("https://t.me/BrickFacadeMagicChanal", "_blank")}
+            >
+              <Send className="w-5 h-5" />
+              Наш Telegram канал
+            </Button>
           </div>
         </div>
       </div>
