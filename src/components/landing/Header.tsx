@@ -23,7 +23,7 @@ const Header = () => {
         <div className="flex items-center gap-4">
           <a href="tel:+7 960 573 17 23" className="hidden sm:flex items-center gap-2 text-sm font-medium">
             <Phone className="w-4 h-4" />
-            +7 (999) 123-45-67
+            +7 960 573 17 23
           </a>
           <Button size="sm" onClick={scrollToContact}>
             Заявка
