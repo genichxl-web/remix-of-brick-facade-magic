@@ -1,45 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
-import heroImage from "@/assets/hero-fence.jpg";
-import nightImage from "@/assets/night-lighting.jpg";
+import { usePortfolioProjects } from "@/hooks/usePortfolioProjects";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const PortfolioSection = () => {
-  const { photos } = useGalleryPhotos("portfolio");
-  
-  const defaultProjects = [
-    {
-      title: "Забор 32 м, автоматические ворота",
-      location: "КП «Новорижский»",
-      description: "Был пустой участок без ограждения. Задача: парадный фасад + автоматика. Реализовали за 23 дня под ключ.",
-      image: heroImage,
-    },
-    {
-      title: "Забор 48 м с подсветкой",
-      location: "СНТ «Лесное»",
-      description: "Задача: заменить старый деревянный забор на премиальный. Добавили архитектурную подсветку. Срок: 28 дней.",
-      image: nightImage,
-    },
-    {
-      title: "Забор 25 м + двое ворот",
-      location: "Истринский район",
-      description: "Угловой участок с двумя въездами. Комплексное решение с двумя автоматическими воротами.",
-      image: heroImage,
-    },
-    {
-      title: "Забор 40 м, калитка, ворота",
-      location: "Одинцовский район",
-      description: "Стандартный комплект под ключ: забор, автоворота, встроенная калитка с домофоном. Срок: 21 день.",
-      image: nightImage,
-    },
-  ];
+  const { projects, loading } = usePortfolioProjects();
 
-  // If we have photos from database, use them with default titles
-  const projects = photos.length > 0 
-    ? photos.slice(0, 8).map((photo, index) => ({
-        ...defaultProjects[index % defaultProjects.length],
-        image: photo.image_url
-      }))
-    : defaultProjects;
+  // Hide section if no projects
+  if (!loading && projects.length === 0) {
+    return null;
+  }
 
   return (
     <section id="portfolio" className="py-20 bg-background">
@@ -52,22 +27,48 @@ const PortfolioSection = () => {
         </p>
         
         <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, index) => (
-            <Card key={index} className="overflow-hidden">
-              <div className="aspect-video overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+          {projects.map((project) => (
+            <Card key={project.id} className="overflow-hidden">
+              {project.photos.length > 0 ? (
+                <div className="relative">
+                  <Carousel className="w-full">
+                    <CarouselContent>
+                      {project.photos.map((photo) => (
+                        <CarouselItem key={photo.id}>
+                          <div className="aspect-video overflow-hidden">
+                            <img
+                              src={photo.image_url}
+                              alt={project.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {project.photos.length > 1 && (
+                      <>
+                        <CarouselPrevious className="left-2" />
+                        <CarouselNext className="right-2" />
+                      </>
+                    )}
+                  </Carousel>
+                </div>
+              ) : (
+                <div className="aspect-video bg-muted flex items-center justify-center">
+                  <span className="text-muted-foreground">Нет фото</span>
+                </div>
+              )}
               <CardHeader>
                 <CardTitle className="text-xl">{project.title}</CardTitle>
-                <p className="text-primary font-medium">{project.location}</p>
+                {project.location && (
+                  <p className="text-primary font-medium">{project.location}</p>
+                )}
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{project.description}</p>
-              </CardContent>
+              {project.description && (
+                <CardContent>
+                  <p className="text-muted-foreground">{project.description}</p>
+                </CardContent>
+              )}
             </Card>
           ))}
         </div>
