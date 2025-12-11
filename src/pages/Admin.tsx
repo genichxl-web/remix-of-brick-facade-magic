@@ -478,7 +478,7 @@ const Admin = () => {
                       <label className="cursor-pointer">
                         <input
                           type="file"
-                          accept=".jpg,.jpeg,.png,.webp,.gif"
+                          accept="image/*"
                           multiple
                           className="hidden"
                           onChange={(e) => handleUpload(section.key, e.target.files)}
@@ -540,7 +540,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept="image/*"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && handleColorUpload(e.target.files[0])}
                       disabled={uploading === "color" || !newColorName.trim()}
@@ -552,7 +552,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept="image/*"
                       multiple
                       className="hidden"
                       onChange={(e) => handleBulkColorUpload(e.target.files)}
@@ -616,7 +616,7 @@ const Admin = () => {
                   <label className="cursor-pointer">
                     <input
                       type="file"
-                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      accept="image/*"
                       className="hidden"
                       onChange={(e) => e.target.files?.[0] && handleFillUpload(e.target.files[0])}
                       disabled={uploading === "fill" || !newFillName.trim()}
