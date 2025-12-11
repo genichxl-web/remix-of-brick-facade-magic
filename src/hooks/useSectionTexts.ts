@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
 interface SectionText {
-  title: string | null;
-  subtitle: string | null;
+  title: string;
+  subtitle: string;
   description: string | null;
 }
 
-const defaultTexts: Record<string, SectionText> = {
+const sectionTexts: Record<string, SectionText> = {
   hero: { title: "Лицевой Забор БРИК", subtitle: "Премиальные фасадные системы ограждений для вашего дома", description: null },
   target: { title: "Вам точно подойдёт", subtitle: "Идеальное решение для требовательных домовладельцев", description: null },
   texture: { title: "Натуральная текстура скалы", subtitle: "Каждый блок уникален — природная красота без повторений", description: null },
@@ -26,29 +23,6 @@ const defaultTexts: Record<string, SectionText> = {
 };
 
 export const useSectionText = (sectionKey: string) => {
-  const [text, setText] = useState<SectionText>(defaultTexts[sectionKey] || { title: null, subtitle: null, description: null });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchText = async () => {
-      const { data } = await supabase
-        .from("section_texts")
-        .select("title, subtitle, description")
-        .eq("section_key", sectionKey)
-        .maybeSingle();
-
-      if (data) {
-        setText({
-          title: data.title || defaultTexts[sectionKey]?.title || null,
-          subtitle: data.subtitle || defaultTexts[sectionKey]?.subtitle || null,
-          description: data.description || defaultTexts[sectionKey]?.description || null,
-        });
-      }
-      setLoading(false);
-    };
-
-    fetchText();
-  }, [sectionKey]);
-
-  return { ...text, loading };
+  const text = sectionTexts[sectionKey] || { title: "", subtitle: "", description: null };
+  return { ...text, loading: false };
 };
