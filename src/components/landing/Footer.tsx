@@ -18,7 +18,6 @@ const Footer = () => {
               >
                 +7 960 573 17 23
                 <Phone className="w-4 h-4" />
-                +7 (999) 123-45-67
               </a>
               <a
                 href="mailto:info@brik-zabor.ru"
