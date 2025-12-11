@@ -5,7 +5,7 @@ const AboutSection = () => {
   const features = [
     {
       icon: Factory,
-      text: "Сами производим, сами монтируем",
+      text: "Производство находится в г. Рязань",
     },
     {
       icon: MapPin,
@@ -46,8 +46,8 @@ const AboutSection = () => {
           </div>
 
           <div className="flex justify-center mt-10">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="gap-2"
               onClick={() => window.open("https://t.me/BrickFacadeMagicChanal", "_blank")}
             >
