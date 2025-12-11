@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers, Bot, Save, Plus, FileText, Briefcase } from "lucide-react";
+import { Upload, Trash2, Image, Check, X, ArrowLeft, Palette, Layers, Bot, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface GalleryPhoto {
@@ -39,26 +39,9 @@ interface SectionText {
   description: string | null;
 }
 
-interface SectionItem {
-  id: string;
-  section_key: string;
-  text: string;
-  display_order: number;
-}
-
-interface PortfolioProject {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  display_order: number;
-}
-
 const Admin = () => {
   const [photosBySection, setPhotosBySection] = useState<Record<string, GalleryPhoto[]>>({});
   const [sectionTexts, setSectionTexts] = useState<Record<string, SectionText>>({});
-  const [sectionItems, setSectionItems] = useState<SectionItem[]>([]);
-  const [portfolioProjects, setPortfolioProjects] = useState<PortfolioProject[]>([]);
   const [pillarColors, setPillarColors] = useState<PillarColor[]>([]);
   const [fillTypes, setFillTypes] = useState<FillType[]>([]);
   const [uploading, setUploading] = useState<string | null>(null);
@@ -69,8 +52,6 @@ const Admin = () => {
   const [newFillName, setNewFillName] = useState("");
   const [aiPrompt, setAiPrompt] = useState("");
   const [savingPrompt, setSavingPrompt] = useState(false);
-  const [newItemText, setNewItemText] = useState("");
-  const [newProjectTitle, setNewProjectTitle] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -147,8 +128,6 @@ const Admin = () => {
     if (isAuthenticated) {
       fetchAllPhotos();
       fetchSectionTexts();
-      fetchSectionItems();
-      fetchPortfolioProjects();
       fetchPillarColors();
       fetchFillTypes();
       fetchAiPrompt();
@@ -219,123 +198,6 @@ const Admin = () => {
       toast({ title: "Тексты сохранены" });
     }
     setSavingText(null);
-  };
-
-  const fetchSectionItems = async () => {
-    const { data } = await supabase
-      .from("section_items")
-      .select("*")
-      .order("display_order", { ascending: true });
-    if (data) setSectionItems(data);
-  };
-
-  const fetchPortfolioProjects = async () => {
-    const { data } = await supabase
-      .from("portfolio_projects")
-      .select("*")
-      .order("display_order", { ascending: true });
-    if (data) setPortfolioProjects(data);
-  };
-
-  const addSectionItem = async (sectionKey: string) => {
-    if (!newItemText.trim()) return;
-    const { error } = await supabase.from("section_items").insert({
-      section_key: sectionKey,
-      text: newItemText.trim(),
-      display_order: sectionItems.filter(i => i.section_key === sectionKey).length
-    });
-    if (!error) {
-      setNewItemText("");
-      fetchSectionItems();
-      toast({ title: "Пункт добавлен" });
-    }
-  };
-
-  const updateSectionItem = async (id: string, text: string) => {
-    setSectionItems(prev => prev.map(item => item.id === id ? { ...item, text } : item));
-  };
-
-  const saveSectionItem = async (item: SectionItem) => {
-    const { error } = await supabase
-      .from("section_items")
-      .update({ text: item.text })
-      .eq("id", item.id);
-    if (!error) toast({ title: "Сохранено" });
-  };
-
-  const deleteSectionItem = async (id: string) => {
-    const { error } = await supabase.from("section_items").delete().eq("id", id);
-    if (!error) {
-      fetchSectionItems();
-      toast({ title: "Пункт удалён" });
-    }
-  };
-
-  const addPortfolioProject = async () => {
-    if (!newProjectTitle.trim()) return;
-    const { error } = await supabase.from("portfolio_projects").insert({
-      title: newProjectTitle.trim(),
-      display_order: portfolioProjects.length
-    });
-    if (!error) {
-      setNewProjectTitle("");
-      fetchPortfolioProjects();
-      toast({ title: "Проект добавлен" });
-    }
-  };
-
-  const updatePortfolioProject = async (id: string, field: 'title' | 'description', value: string) => {
-    setPortfolioProjects(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
-  };
-
-  const savePortfolioProject = async (project: PortfolioProject) => {
-    const { error } = await supabase
-      .from("portfolio_projects")
-      .update({ title: project.title, description: project.description })
-      .eq("id", project.id);
-    if (!error) toast({ title: "Проект сохранён" });
-  };
-
-  const uploadPortfolioImage = async (projectId: string, file: File) => {
-    if (!validateFile(file)) return;
-    setUploading(`portfolio-${projectId}`);
-    
-    const compressedFile = await compressImage(file);
-    const fileName = `portfolio/${Date.now()}.jpg`;
-
-    const { error: uploadError } = await supabase.storage.from("gallery").upload(fileName, compressedFile);
-    if (uploadError) {
-      toast({ title: "Ошибка загрузки", variant: "destructive" });
-      setUploading(null);
-      return;
-    }
-
-    const { data: urlData } = supabase.storage.from("gallery").getPublicUrl(fileName);
-    
-    const { error } = await supabase
-      .from("portfolio_projects")
-      .update({ image_url: urlData.publicUrl })
-      .eq("id", projectId);
-
-    if (!error) {
-      fetchPortfolioProjects();
-      toast({ title: "Фото загружено" });
-    }
-    setUploading(null);
-  };
-
-  const deletePortfolioProject = async (project: PortfolioProject) => {
-    if (project.image_url) {
-      const urlParts = project.image_url.split("/gallery/");
-      if (urlParts[1]) {
-        await supabase.storage.from("gallery").remove([urlParts[1]]);
-      }
-    }
-    const { error } = await supabase.from("portfolio_projects").delete().eq("id", project.id);
-    if (!error) {
-      fetchPortfolioProjects();
-      toast({ title: "Проект удалён" });
-    }
   };
 
   const fetchPillarColors = async () => {
@@ -627,30 +489,22 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="gallery" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="gallery" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
-              <span className="hidden sm:inline">Галерея</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Контент</span>
-            </TabsTrigger>
-            <TabsTrigger value="portfolio" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">Портфолио</span>
+              Галерея
             </TabsTrigger>
             <TabsTrigger value="colors" className="flex items-center gap-2">
               <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">Цвета</span>
+              Цвета ({pillarColors.length}/18)
             </TabsTrigger>
             <TabsTrigger value="fills" className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
-              <span className="hidden sm:inline">Заполнения</span>
+              Заполнения ({fillTypes.length}/6)
             </TabsTrigger>
             <TabsTrigger value="ai" className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Промт</span>
+              AI Промт
             </TabsTrigger>
           </TabsList>
 
@@ -757,136 +611,6 @@ const Admin = () => {
                 </Card>
               );
             })}
-          </TabsContent>
-
-          <TabsContent value="content" className="space-y-6">
-            {/* Section Items - Что мы делаем */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Пункты раздела «Что мы делаем»
-                </CardTitle>
-                <CardDescription>Редактируйте пункты списка услуг</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-3">
-                  <Input
-                    placeholder="Новый пункт..."
-                    value={newItemText}
-                    onChange={(e) => setNewItemText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && addSectionItem('services')}
-                  />
-                  <Button onClick={() => addSectionItem('services')}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Добавить
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  {sectionItems.filter(item => item.section_key === 'services').map((item) => (
-                    <div key={item.id} className="flex gap-2 items-center">
-                      <Input
-                        value={item.text}
-                        onChange={(e) => updateSectionItem(item.id, e.target.value)}
-                        className="flex-1"
-                      />
-                      <Button size="sm" variant="outline" onClick={() => saveSectionItem(item)}>
-                        <Save className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteSectionItem(item.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="portfolio" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Проекты портфолио
-                </CardTitle>
-                <CardDescription>Добавляйте проекты с названием, описанием и фото</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex gap-3">
-                  <Input
-                    placeholder="Название проекта..."
-                    value={newProjectTitle}
-                    onChange={(e) => setNewProjectTitle(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && addPortfolioProject()}
-                  />
-                  <Button onClick={addPortfolioProject}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Добавить проект
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {portfolioProjects.map((project) => (
-                    <Card key={project.id} className="overflow-hidden">
-                      <div className="aspect-video relative bg-muted">
-                        {project.image_url ? (
-                          <img src={project.image_url} alt={project.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Image className="h-12 w-12 text-muted-foreground/50" />
-                          </div>
-                        )}
-                        <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-                          <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                            className="hidden"
-                            onChange={(e) => e.target.files?.[0] && uploadPortfolioImage(project.id, e.target.files[0])}
-                            disabled={uploading === `portfolio-${project.id}`}
-                          />
-                          <span className="text-white flex items-center gap-2">
-                            <Upload className="h-5 w-5" />
-                            {uploading === `portfolio-${project.id}` ? "Загрузка..." : "Загрузить фото"}
-                          </span>
-                        </label>
-                      </div>
-                      <CardContent className="p-4 space-y-3">
-                        <Input
-                          value={project.title}
-                          onChange={(e) => updatePortfolioProject(project.id, 'title', e.target.value)}
-                          placeholder="Название проекта"
-                        />
-                        <Textarea
-                          value={project.description || ""}
-                          onChange={(e) => updatePortfolioProject(project.id, 'description', e.target.value)}
-                          placeholder="Описание проекта..."
-                          rows={3}
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" className="flex-1" onClick={() => savePortfolioProject(project)}>
-                            <Save className="h-4 w-4 mr-2" />
-                            Сохранить
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => deletePortfolioProject(project)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                {portfolioProjects.length === 0 && (
-                  <div className="flex items-center justify-center h-32 border-2 border-dashed rounded-lg text-muted-foreground">
-                    <div className="text-center">
-                      <Briefcase className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Нет проектов</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="colors">
