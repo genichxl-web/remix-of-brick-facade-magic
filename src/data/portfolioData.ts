@@ -39,4 +39,18 @@ export const portfolioProjects = [
       "/portfolio/minsk-6.jpg",
     ],
   },
+  {
+    id: "4",
+    title: "Забор 40 метров",
+    location: "Клин",
+    description: "Двое ворот, с подпорной стеной",
+    photos: [
+      "/portfolio/klin-1.jpg",
+      "/portfolio/klin-2.jpg",
+      "/portfolio/klin-3.jpg",
+      "/portfolio/klin-4.jpg",
+      "/portfolio/klin-5.jpg",
+      "/portfolio/klin-6.jpg",
+    ],
+  },
 ];
