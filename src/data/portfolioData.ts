@@ -25,4 +25,18 @@ export const portfolioProjects = [
       "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/0989047a-37c1-4450-b987-ae9c3841545e/1765450124379-2.jpg",
     ],
   },
+  {
+    id: "3",
+    title: "Забор 60 метров",
+    location: "Минск",
+    description: "Забор со штакетником на уклоне",
+    photos: [
+      "/portfolio/minsk-1.jpg",
+      "/portfolio/minsk-2.jpg",
+      "/portfolio/minsk-3.jpg",
+      "/portfolio/minsk-4.jpg",
+      "/portfolio/minsk-5.jpg",
+      "/portfolio/minsk-6.jpg",
+    ],
+  },
 ];
