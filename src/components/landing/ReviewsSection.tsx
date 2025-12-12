@@ -1,10 +1,10 @@
-import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
+import { galleryImages } from "@/data/galleryImages";
 
 const ReviewsSection = () => {
-  const { photos, loading } = useGalleryPhotos("reviews");
+  const photos = galleryImages.reviews;
 
-  // Hide section if no reviews uploaded
-  if (!loading && photos.length === 0) {
+  // Hide section if no reviews
+  if (photos.length === 0) {
     return null;
   }
 
@@ -18,23 +18,18 @@ const ReviewsSection = () => {
           Что говорят о нас реальные заказчики
         </p>
         
-        {loading ? (
-          <div className="flex justify-center">
-            <div className="animate-pulse text-muted-foreground">Загрузка...</div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {photos.map((photo) => (
-              <div key={photo.id} className="aspect-[9/16] rounded-lg overflow-hidden shadow-lg">
-                <img 
-                  src={photo.image_url} 
-                  alt="Отзыв клиента" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {photos.map((photo, index) => (
+            <div key={index} className="aspect-[9/16] rounded-lg overflow-hidden shadow-lg">
+              <img 
+                src={photo} 
+                alt="Отзыв клиента" 
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

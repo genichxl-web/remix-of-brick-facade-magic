@@ -1,11 +1,10 @@
-import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
+import { galleryImages } from "@/data/galleryImages";
 import heroImage from "@/assets/hero-fence.jpg";
 import { Button } from "@/components/ui/button";
 import { Factory, Wrench, Shield } from "lucide-react";
 
 const HeroSection = () => {
-  const { photos } = useGalleryPhotos("hero");
-  const backgroundImage = photos.length > 0 ? photos[0].image_url : heroImage;
+  const backgroundImage = galleryImages.hero[0] || heroImage;
 
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
