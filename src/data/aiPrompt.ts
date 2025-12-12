@@ -5,7 +5,7 @@ export function getSystemPrompt(): string {
   const colorOptions = pillarColors.map((c, i) => `${i + 1}. ${c.name}`).join("\n");
   const fillOptions = fillTypes.map((f, i) => `${i + 1}. ${f.name}`).join("\n");
 
-  return `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
+  return `Ты — AI-ассистент компании БРИК, специализирующейся на каменных лицевых заборах.
 
 ТВОЯ ГЛАВНАЯ ЗАДАЧА: Собрать информацию для расчёта стоимости забора.
 
