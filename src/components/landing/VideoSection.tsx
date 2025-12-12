@@ -1,22 +1,49 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 const VideoSection = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    const loadWidget = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      
+      // Clear previous widget
+      container.innerHTML = "";
+      
+      // Create widget container
+      const widgetDiv = document.createElement("div");
+      widgetDiv.id = "vk_video_post_" + Date.now();
+      container.appendChild(widgetDiv);
+      
+      // Calculate width based on container
+      const width = Math.min(container.offsetWidth, 600);
+      
+      // @ts-ignore
+      if (window.VK?.Widgets) {
+        // @ts-ignore
+        window.VK.Widgets.Post(widgetDiv.id, -231889841, 9, "BEYBZ4DWJnaQh5UtQ0neRv9Lag", { width });
+      }
+    };
+
     const existingScript = document.querySelector('script[src*="vk.com/js/api/openapi"]');
     if (!existingScript) {
       const script = document.createElement("script");
       script.src = "https://vk.com/js/api/openapi.js?173";
       script.async = true;
+      script.onload = loadWidget;
       document.body.appendChild(script);
-      script.onload = () => {
-        // @ts-ignore
-        window.VK?.Widgets?.Post("vk_video_post", -231889841, 9, "BEYBZ4DWJnaQh5UtQ0neRv9Lag");
-      };
     } else {
-      // @ts-ignore
-      window.VK?.Widgets?.Post("vk_video_post", -231889841, 9, "BEYBZ4DWJnaQh5UtQ0neRv9Lag");
+      loadWidget();
     }
+
+    // Reload on resize
+    const handleResize = () => {
+      setTimeout(loadWidget, 100);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const scrollToContact = () => {
@@ -38,8 +65,8 @@ const VideoSection = () => {
           </p>
         </div>
 
-        <div className="flex justify-center mb-10 px-4">
-          <div id="vk_video_post" className="w-full [&>*]:!w-full [&_iframe]:!w-full"></div>
+        <div className="flex justify-center mb-10">
+          <div ref={containerRef} className="w-full max-w-2xl"></div>
         </div>
 
         <div className="text-center">
