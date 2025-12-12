@@ -38,8 +38,8 @@ const VideoSection = () => {
           </p>
         </div>
 
-        <div className="flex justify-center mb-10">
-          <div id="vk_video_post" className="w-full max-w-3xl"></div>
+        <div className="flex justify-center mb-10 px-4">
+          <div id="vk_video_post" className="w-full [&>*]:!w-full [&_iframe]:!w-full"></div>
         </div>
 
         <div className="text-center">
