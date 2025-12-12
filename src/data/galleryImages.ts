@@ -9,22 +9,22 @@ export const galleryImages = {
   ],
   
   texture: [
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765429381251-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765429419117-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765429468392-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765429530689-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765435066908-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765435194116-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765435233181-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765398223205-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765398589725-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765398824475-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765398891767-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765398916829-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765399014247-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/texture/1765399230543-0.jpg",
   ],
   
   pillars: [
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429056341-0.jpg",
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429168691-0.jpg",
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429213311-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429364580-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765437317380-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765437380199-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429363189-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429402286-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/pillars/1765429429231-0.jpg",
   ],
   
   foundation: [
@@ -44,12 +44,12 @@ export const galleryImages = {
   ],
   
   symmetry: [
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437464476-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437476437-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437485556-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437494268-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437503266-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437510979-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437193154-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437206438-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437222529-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437445158-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437456858-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/symmetry/1765437477503-0.jpg",
   ],
   
   gates: [
@@ -70,9 +70,25 @@ export const galleryImages = {
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765400087777-0.jpg",
   ],
   
-  portfolio: [],
+  portfolio: [
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438081181-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438090368-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438099611-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438120175-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438178332-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438189484-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438198183-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438208743-0.jpg",
+  ],
   
-  reviews: [],
+  reviews: [
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477477008-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477482998-1.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477489258-2.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477496106-3.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477503578-4.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/reviews/1765477510606-5.jpg",
+  ],
 };
 
 // Фолбэк изображения из локальных ассетов
