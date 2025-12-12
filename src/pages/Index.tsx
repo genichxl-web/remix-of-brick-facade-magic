@@ -27,11 +27,11 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <TextureSection />
         <TargetAudienceSection />
         <ServicesSection />
         <ColorOptionsSection />
         <FillOptionsSection />
-        <TextureSection />
         <PillarsSection />
         <FoundationSection />
         <LightingSection />
