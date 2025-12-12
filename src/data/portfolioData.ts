@@ -6,9 +6,9 @@ export const portfolioProjects = [
     location: "Спасск-Клепики",
     description: "Серый профлист в заполнении и серый блок",
     photos: [
+      "/portfolio/spask-klepiki-3.jpg",
       "/portfolio/spask-klepiki-1.jpg",
       "/portfolio/spask-klepiki-2.jpg",
-      "/portfolio/spask-klepiki-3.jpg",
       "/portfolio/spask-klepiki-4.jpg",
       "/portfolio/spask-klepiki-5.jpg",
       "/portfolio/spask-klepiki-6.jpg",
