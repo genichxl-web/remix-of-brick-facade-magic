@@ -1,6 +1,24 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 const VideoSection = () => {
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src*="vk.com/js/api/openapi"]');
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://vk.com/js/api/openapi.js?173";
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = () => {
+        // @ts-ignore
+        window.VK?.Widgets?.Post("vk_video_post", -231889841, 9, "BEYBZ4DWJnaQh5UtQ0neRv9Lag");
+      };
+    } else {
+      // @ts-ignore
+      window.VK?.Widgets?.Post("vk_video_post", -231889841, 9, "BEYBZ4DWJnaQh5UtQ0neRv9Lag");
+    }
+  }, []);
+
   const scrollToContact = () => {
     document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -21,17 +39,7 @@ const VideoSection = () => {
         </div>
 
         <div className="flex justify-center mb-10">
-          <div className="w-full max-w-3xl aspect-video">
-            <iframe
-              src="https://vk.com/video_ext.php?oid=-231889841&id=456239022&hd=2"
-              width="100%"
-              height="100%"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;"
-              frameBorder="0"
-              allowFullScreen
-              className="rounded-lg shadow-lg"
-            />
-          </div>
+          <div id="vk_video_post" className="w-full max-w-3xl"></div>
         </div>
 
         <div className="text-center">
