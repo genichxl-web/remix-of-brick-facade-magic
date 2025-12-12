@@ -2,18 +2,16 @@
 export const portfolioProjects = [
   {
     id: "1",
-    title: "Забор 15 м с заполнением жалюзи",
-    location: "Рязань",
-    description: "Напишу позже",
+    title: "Забор 25 метров",
+    location: "Спасск-Клепики",
+    description: "Серый профлист в заполнении и серый блок",
     photos: [
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449755286-0.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449828385-0.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449831850-1.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449864663-0.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449867937-1.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449871328-2.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449874854-3.jpg",
-      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/20597a23-4634-42bf-a170-74063c65ebbd/1765449878037-4.jpg",
+      "/portfolio/spask-klepiki-1.jpg",
+      "/portfolio/spask-klepiki-2.jpg",
+      "/portfolio/spask-klepiki-3.jpg",
+      "/portfolio/spask-klepiki-4.jpg",
+      "/portfolio/spask-klepiki-5.jpg",
+      "/portfolio/spask-klepiki-6.jpg",
     ],
   },
   {
