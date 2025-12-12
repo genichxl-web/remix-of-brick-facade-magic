@@ -1,14 +1,12 @@
+import { galleryImages } from "@/data/galleryImages";
 import nightImage from "@/assets/night-lighting.jpg";
 import { Check } from "lucide-react";
 import ImageGallery from "./ImageGallery";
 import CTAButton from "./CTAButton";
-import { useGalleryPhotos } from "@/hooks/useGalleryPhotos";
 
 const LightingSection = () => {
-  const { photos } = useGalleryPhotos("lighting");
-  
-  // First photo is the big one, rest go to gallery
-  const mainPhoto = photos.length > 0 ? photos[0].image_url : nightImage;
+  const photos = galleryImages.lighting;
+  const mainPhoto = photos.length > 0 ? photos[0] : nightImage;
   
   const features = [
     "Встроена в столбы",
@@ -26,6 +24,7 @@ const LightingSection = () => {
               src={mainPhoto}
               alt="Архитектурная подсветка забора ночью"
               className="rounded-xl shadow-2xl w-full"
+              loading="lazy"
             />
           </div>
           

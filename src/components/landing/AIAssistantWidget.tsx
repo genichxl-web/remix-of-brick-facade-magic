@@ -5,18 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface PillarColor {
-  id: string;
-  name: string;
-  image_url: string;
-}
-
-interface FillType {
-  id: string;
-  name: string;
-  image_url: string;
-}
+import { pillarColors, fillTypes } from "@/data/productOptions";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -33,8 +22,6 @@ const AIAssistantWidget = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
-  const [pillarColors, setPillarColors] = useState<PillarColor[]>([]);
-  const [fillTypes, setFillTypes] = useState<FillType[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -56,19 +43,6 @@ const AIAssistantWidget = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    fetchColorsAndFills();
-  }, []);
-
-  const fetchColorsAndFills = async () => {
-    const [colorsRes, fillsRes] = await Promise.all([
-      supabase.from("pillar_colors").select("*").order("display_order"),
-      supabase.from("fill_types").select("*").order("display_order")
-    ]);
-    if (colorsRes.data) setPillarColors(colorsRes.data);
-    if (fillsRes.data) setFillTypes(fillsRes.data);
-  };
 
   const handleSend = async () => {
     if (!message.trim() || isLoading || leadSubmitted) return;
@@ -127,9 +101,9 @@ const AIAssistantWidget = () => {
         let images: { url: string; name: string }[] | undefined;
         
         if (data.showColors && pillarColors.length > 0) {
-          images = pillarColors.map(c => ({ url: c.image_url, name: c.name }));
+          images = pillarColors.map(c => ({ url: c.imageUrl, name: c.name }));
         } else if (data.showFills && fillTypes.length > 0) {
-          images = fillTypes.map(f => ({ url: f.image_url, name: f.name }));
+          images = fillTypes.map(f => ({ url: f.imageUrl, name: f.name }));
         }
 
         setMessages(prev => [...prev, { role: "assistant", content: data.reply, images }]);

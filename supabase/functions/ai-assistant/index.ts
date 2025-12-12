@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -90,7 +89,7 @@ async function sendToAmoCRM(leadData: {
   }
 }
 
-async function getSystemPrompt(supabase: any, colors: string[], fills: string[]): Promise<string> {
+function getSystemPrompt(colors: string[], fills: string[]): string {
   const colorOptions = colors.length > 0 
     ? colors.map((c: string, i: number) => `${i + 1}. ${c}`).join("\n")
     : "1. Графит\n2. Коричневый\n3. Бежевый\n4. Терракот";
@@ -99,24 +98,6 @@ async function getSystemPrompt(supabase: any, colors: string[], fills: string[])
     ? fills.map((f: string, i: number) => `${i + 1}. ${f}`).join("\n")
     : "1. Профлист\n2. Штакетник\n3. Блоки БРИК";
 
-  // Try to get custom prompt from database
-  const { data } = await supabase
-    .from("ai_settings")
-    .select("value")
-    .eq("key", "system_prompt")
-    .single();
-
-  if (data?.value) {
-    // Replace placeholders in custom prompt
-    let prompt = data.value;
-    prompt = prompt.replace(/\{COLORS\}/g, colorOptions);
-    prompt = prompt.replace(/\{FILLS\}/g, fillOptions);
-    prompt = prompt.replace(/\{COLOR_COUNT\}/g, String(colors.length || 4));
-    prompt = prompt.replace(/\{FILL_COUNT\}/g, String(fills.length || 3));
-    return prompt;
-  }
-
-  // Fallback to default prompt
   return `Ты — AI-ассистент компании БРИК, специализирующейся на премиальных лицевых заборах.
 
 ТВОЯ ГЛАВНАЯ ЗАДАЧА: Собрать информацию для расчёта стоимости забора.
@@ -172,11 +153,6 @@ serve(async (req) => {
   try {
     const { messages, submitLead, colors, fills } = await req.json();
     
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
     if (submitLead) {
       console.log("Submitting lead to AMO CRM:", submitLead);
       const success = await sendToAmoCRM(submitLead);
@@ -197,8 +173,8 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Get system prompt from database
-    const systemPrompt = await getSystemPrompt(supabase, colors || [], fills || []);
+    // Get system prompt with static data
+    const systemPrompt = getSystemPrompt(colors || [], fills || []);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

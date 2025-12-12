@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { usePortfolioProjects } from "@/hooks/usePortfolioProjects";
+import { portfolioProjects } from "@/data/portfolioData";
 import {
   Carousel,
   CarouselContent,
@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/carousel";
 
 const PortfolioSection = () => {
-  const { projects, loading } = usePortfolioProjects();
-
   // Hide section if no projects
-  if (!loading && projects.length === 0) {
+  if (portfolioProjects.length === 0) {
     return null;
   }
 
@@ -27,19 +25,20 @@ const PortfolioSection = () => {
         </p>
         
         <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project) => (
+          {portfolioProjects.map((project) => (
             <Card key={project.id} className="overflow-hidden">
               {project.photos.length > 0 ? (
                 <div className="relative">
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {project.photos.map((photo) => (
-                        <CarouselItem key={photo.id}>
+                      {project.photos.map((photo, index) => (
+                        <CarouselItem key={index}>
                           <div className="aspect-video overflow-hidden">
                             <img
-                              src={photo.image_url}
+                              src={photo}
                               alt={project.title}
                               className="w-full h-full object-cover"
+                              loading="lazy"
                             />
                           </div>
                         </CarouselItem>
