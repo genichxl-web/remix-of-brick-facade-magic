@@ -1,28 +1,28 @@
-// Цвета бетонных блоков (столбов)
+// Цвета бетонных блоков (столбов) - реальные данные из БД
 export const pillarColors = [
-  { id: "1", name: "Графит", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/grafit.jpg" },
-  { id: "2", name: "Коричневый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/korichneviy.jpg" },
-  { id: "3", name: "Бежевый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/bezheviy.jpg" },
-  { id: "4", name: "Терракот", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/terrakot.jpg" },
-  { id: "5", name: "Серый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/seriy.jpg" },
-  { id: "6", name: "Чёрный", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/cherniy.jpg" },
-  { id: "7", name: "Песочный", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/pesochniy.jpg" },
-  { id: "8", name: "Слоновая кость", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/slonovaya-kost.jpg" },
-  { id: "9", name: "Шоколад", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/shokolad.jpg" },
-  { id: "10", name: "Антрацит", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/antratsit.jpg" },
-  { id: "11", name: "Каштан", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/kashtan.jpg" },
-  { id: "12", name: "Янтарь", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/yantar.jpg" },
-  { id: "13", name: "Оливковый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/olivkoviy.jpg" },
-  { id: "14", name: "Карамель", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/karamel.jpg" },
-  { id: "15", name: "Мокко", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/mokko.jpg" },
+  { id: "1", name: "Графит", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397399928.png" },
+  { id: "2", name: "Графит - коричневый - красный", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397602388-0.png" },
+  { id: "3", name: "Графит - коричневый - пепел", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397628478-1.png" },
+  { id: "4", name: "Графит - темно-коричневый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397663310-2.png" },
+  { id: "5", name: "Графит - терра", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397688372-3.png" },
+  { id: "6", name: "Графит - коричневый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397715608-4.png" },
+  { id: "7", name: "Графит - пепел", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397748735-5.png" },
+  { id: "8", name: "Желтый (оливковый)", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397769267-6.png" },
+  { id: "9", name: "Коричневый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397815631-7.png" },
+  { id: "10", name: "Коричневый - красный", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397845091-8.png" },
+  { id: "11", name: "Коричневый - терра", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397875482-9.png" },
+  { id: "12", name: "Красный", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397898035-10.png" },
+  { id: "13", name: "Пепел", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397924522-11.png" },
+  { id: "14", name: "Темно-коричневый", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765397989727-12.png" },
+  { id: "15", name: "Темно-коричневый - пепел", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/colors/1765398018179-13.png" },
 ];
 
-// Типы заполнения между столбами
+// Типы заполнения между столбами - реальные данные из БД
 export const fillTypes = [
-  { id: "1", name: "Профлист", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/proflist.jpg" },
-  { id: "2", name: "Штакетник металлический", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/shtaketnik.jpg" },
-  { id: "3", name: "Блоки БРИК", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/bloki-brik.jpg" },
-  { id: "4", name: "Жалюзи", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/zhalyuzi.jpg" },
-  { id: "5", name: "Ковка", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/kovka.jpg" },
-  { id: "6", name: "Дерево", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/derevo.jpg" },
+  { id: "1", name: "Профлист", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765396978228.png" },
+  { id: "2", name: "Жалюзи", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765397010863.png" },
+  { id: "3", name: "Евроштакетник", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765397041037.png" },
+  { id: "4", name: "Ранчо", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765397087247.png" },
+  { id: "5", name: "Горизонтальный штакетник", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765397119532.png" },
+  { id: "6", name: "Дерево", imageUrl: "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/fills/1765397203212.jpg" },
 ];
