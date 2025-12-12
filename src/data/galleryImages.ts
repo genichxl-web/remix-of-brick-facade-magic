@@ -62,12 +62,12 @@ export const galleryImages = {
   ],
   
   target: [
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437563411-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437573102-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437581571-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437590232-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437598730-0.jpg",
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765437608310-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765399802012-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765399814179-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765399827512-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765400063960-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765400076211-0.jpg",
+    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/target/1765400087777-0.jpg",
   ],
   
   portfolio: [],
