@@ -5,6 +5,7 @@ import ServicesSection from "@/components/landing/ServicesSection";
 import ColorOptionsSection from "@/components/landing/ColorOptionsSection";
 import FillOptionsSection from "@/components/landing/FillOptionsSection";
 import TextureSection from "@/components/landing/TextureSection";
+import VideoSection from "@/components/landing/VideoSection";
 import PillarsSection from "@/components/landing/PillarsSection";
 import FoundationSection from "@/components/landing/FoundationSection";
 import LightingSection from "@/components/landing/LightingSection";
@@ -28,6 +29,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <TextureSection />
+        <VideoSection />
         <TargetAudienceSection />
         <ServicesSection />
         <ColorOptionsSection />
