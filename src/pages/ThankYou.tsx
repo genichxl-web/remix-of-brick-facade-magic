@@ -9,7 +9,7 @@ const ThankYou = () => {
   useEffect(() => {
     // Track page view in Yandex Metrika for SPA navigation
     if (typeof window !== 'undefined' && (window as any).ym) {
-      (window as any).ym(105799605, 'hit', '/thank-you', {
+      (window as any).ym(105799605, 'hit', '/thank-you_BrickMoscow2', {
         title: 'Спасибо за заявку'
       });
     }
