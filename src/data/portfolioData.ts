@@ -20,7 +20,9 @@ export const portfolioProjects = [
     location: "Дмитров",
     description: "Сложный проект на подвесном фундаменте",
     photos: [
-      "/portfolio/dmitrov-1.jpg",
+      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/0989047a-37c1-4450-b987-ae9c3841545e/1765450120628-0.jpg",
+      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/0989047a-37c1-4450-b987-ae9c3841545e/1765450122828-1.jpg",
+      "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/0989047a-37c1-4450-b987-ae9c3841545e/1765450124379-2.jpg",
     ],
   },
   {
