@@ -71,7 +71,7 @@ export const galleryImages = {
   ],
   
   portfolio: [
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438081181-0.jpg",
+    "/portfolio/services-main.jpg",
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438090368-0.jpg",
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438099611-0.jpg",
     "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/portfolio/1765438120175-0.jpg",
