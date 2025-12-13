@@ -1,9 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Home, Send } from "lucide-react";
+import { useEffect } from "react";
 
 const ThankYou = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Track page view in Yandex Metrika for SPA navigation
+    if (typeof window !== 'undefined' && (window as any).ym) {
+      (window as any).ym(105799605, 'hit', '/thank-you', {
+        title: 'Спасибо за заявку'
+      });
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
