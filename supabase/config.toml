@@ -1,7 +1,1 @@
-project_id = "kroivjljpohdcntkaamu"
-
-[functions.send-to-amocrm]
-verify_jwt = false
-
-[functions.ai-assistant]
-verify_jwt = false
+project_id = "fwlrrmaplnibyretmkur"
