@@ -5,7 +5,7 @@ import nightImage from "@/assets/night-lighting.jpg";
 
 export const galleryImages = {
   hero: [
-    "https://kroivjljpohdcntkaamu.supabase.co/storage/v1/object/public/gallery/hero/1765395071886-0.jpeg"
+    heroImage
   ],
   
   texture: [
