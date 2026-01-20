@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useContactForm } from "@/contexts/ContactFormContext";
 
 const PricingSection = () => {
+  const { openContactForm } = useContactForm();
+  
   const factors = [
     "ширина участка",
     "высота столбов",
@@ -11,10 +14,6 @@ const PricingSection = () => {
     "нужны ли ворота, калитка",
     "нужна ли подсветка",
   ];
-
-  const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <section className="py-20 bg-background">
@@ -49,7 +48,7 @@ const PricingSection = () => {
               ))}
             </ul>
             
-            <Button size="lg" className="w-full text-lg" onClick={scrollToContact}>
+            <Button size="lg" className="w-full text-lg" onClick={openContactForm}>
               Получить точную цену
             </Button>
           </div>
