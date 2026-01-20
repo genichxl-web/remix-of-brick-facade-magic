@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Phone } from "lucide-react";
+import { useContactForm } from "@/contexts/ContactFormContext";
 
 const Header = () => {
-  const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { openContactForm } = useContactForm();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -25,7 +24,7 @@ const Header = () => {
             <Phone className="w-4 h-4" />
             +7 960 573 17 23
           </a>
-          <Button size="sm" onClick={scrollToContact}>
+          <Button size="sm" onClick={openContactForm}>
             Заявка
           </Button>
         </div>

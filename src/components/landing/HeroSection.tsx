@@ -2,13 +2,11 @@ import { galleryImages } from "@/data/galleryImages";
 import heroImage from "@/assets/hero-fence.jpg";
 import { Button } from "@/components/ui/button";
 import { Factory, Wrench, Shield } from "lucide-react";
+import { useContactForm } from "@/contexts/ContactFormContext";
 
 const HeroSection = () => {
   const backgroundImage = galleryImages.hero[0] || heroImage;
-
-  const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { openContactForm } = useContactForm();
 
   return (
     <section className="relative min-h-screen flex items-center">
@@ -38,7 +36,7 @@ const HeroSection = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <Button size="lg" className="text-lg px-8 py-6" onClick={scrollToContact}>
+            <Button size="lg" className="text-lg px-8 py-6" onClick={openContactForm}>
               Рассчитать стоимость забора
             </Button>
           </div>

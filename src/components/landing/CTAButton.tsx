@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useContactForm } from "@/contexts/ContactFormContext";
 
 interface CTAButtonProps {
   text?: string;
@@ -7,12 +8,13 @@ interface CTAButtonProps {
 }
 
 const CTAButton = ({ text = "Рассчитать стоимость", onClick }: CTAButtonProps) => {
+  const { openContactForm } = useContactForm();
+  
   const handleClick = () => {
     if (onClick) {
       onClick();
     } else {
-      const contactSection = document.getElementById("contact");
-      contactSection?.scrollIntoView({ behavior: "smooth" });
+      openContactForm();
     }
   };
 
